@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 
-import 'MailTm.dart';
+import 'mailtm.dart';
 
 class Requests {
   ///Makes a post request using the given [endpoint] on the account

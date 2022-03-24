@@ -1,4 +1,3 @@
-// ignore_for_file: invalid_use_of_protected_member
 import 'dart:async';
 
 import 'requests.dart';
@@ -179,7 +178,6 @@ class Account {
         updatedAt: DateTime.parse(json['updatedAt']),
         authHeaders: {},
       );
-
 
   ///A stream of messages.
   Stream<Message> get messages async* {

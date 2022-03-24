@@ -1,6 +1,6 @@
 name: mailtm_client
-description: Mail.tm api wrapper.
-version: 1.0.0
+description: This package is a simple but complete mail.tm api wrapper, you can use this to save and manage your accounts, as well read all your temporary emails.
+version: 1.0.1
 homepage: https://github.com/GiuseppeFn/mailtm_client
 repository: https://github.com/GiuseppeFn/mailtm_client
 
@@ -11,3 +11,6 @@ dependencies:
   dio: ^4.0.4
   username_gen: ^1.0.4
   path: ^1.8.1
+
+dev_dependencies: 
+  lints: ^1.0.1

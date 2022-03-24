@@ -1,5 +1,3 @@
-// ignore_for_file: invalid_use_of_protected_member
-
 import 'dart:io';
 import 'dart:convert' show jsonEncode, jsonDecode;
 import 'dart:math' show Random;
