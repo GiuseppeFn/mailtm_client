@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "*.dart": "dart",
+        "cstdio": "c"
+    }
+}
