@@ -19,12 +19,13 @@ String generate_password(length) {
 ///Opens [url] using system commands and [Process.run]
 Future<void> openUrl(String url) async {
   String cmd;
-  if (Platform.isWindows)
+  if (Platform.isWindows) {
     cmd = 'start';
-  else if (Platform.isMacOS)
+  } else if (Platform.isMacOS) {
     cmd = 'open';
-  else
+  } else {
     cmd = 'xdg-open';
+  }
 
   await Process.run(cmd, [url]);
 }

@@ -71,8 +71,9 @@ class Account {
   }
 
   Future<bool> delete() async {
-    if (_authHeaders.isEmpty)
+    if (_authHeaders.isEmpty) {
       await this.update(updateInstance: true, setAuth: true);
+    }
 
     return (await Requests.delete('accounts/$id', _authHeaders)) == 204;
   }

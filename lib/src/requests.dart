@@ -29,9 +29,12 @@ class Requests {
       },
       options: Options(headers: headers),
     );
-    if (!(codes ?? [200, 201]).contains(response.statusCode))
+    if (!(codes ?? [200, 201]).contains(response.statusCode)) {
       throw Exception(error ?? 'Error doing request.');
-    if (response.data is String) response.data = jsonDecode(response.data);
+    }
+    if (response.data is String) {
+      response.data = jsonDecode(response.data);
+    }
     return Map<String, dynamic>.from(response.data);
   }
 
@@ -51,8 +54,9 @@ class Requests {
       options: Options(headers: headers),
     );
 
-    if (!(codes ?? [200, 201]).contains(response.statusCode))
+    if (!(codes ?? [200, 201]).contains(response.statusCode)) {
       throw Exception(error ?? 'Error doing request.');
+    }
 
     return jsonDecode(response.data);
   }

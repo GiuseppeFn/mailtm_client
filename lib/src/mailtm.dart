@@ -29,17 +29,24 @@ class MailTm {
 
   MailTm({File? customDb, this.canSave: true})
       : this.customDb = customDb ?? db {
-    if (!canSave) return;
+    if (!canSave) {
+      return;
+    }
     this.customDb.createSync(recursive: true);
   }
 
   ///Init a new [MailTm] instance
   static Future<MailTm> init({File? customDb, bool canSave: true}) async {
-    if (!canSave) return MailTm(canSave: false);
-    if (customDb != null && !(await customDb.exists()))
+    if (!canSave) {
+      return MailTm(canSave: false);
+    }
+    if (customDb != null && !(await customDb.exists())) {
       await customDb.create(recursive: true);
+    }
 
-    if (!(await db.exists())) await db.create(recursive: true);
+    if (!(await db.exists())) {
+      await db.create(recursive: true);
+    }
     return MailTm._(customDb ?? db);
   }
 
@@ -84,7 +91,9 @@ class MailTm {
 
   ///Saves a new [Account] to the db, if [canSave] is true
   void saveAccount(Account account) async {
-    if (!canSave) return;
+    if (!canSave) {
+      return;
+    }
     String data = (await customDb.readAsString()).trim();
     List accounts = (data != '' ? jsonDecode(data) : [])..add(account.toJson());
     await customDb.writeAsString(jsonEncode(accounts));
@@ -94,11 +103,14 @@ class MailTm {
   ///Loads all the accounts from the [customDb] or [db]
   ///If [canSave] is false, an exception is thrown.
   Future<List<Account>> get loadAccounts async {
-    if (!canSave)
+    if (!canSave) {
       throw Exception('Cannot load accounts without the "Save" feature.');
+    }
     List<dynamic> accounts = jsonDecode(await customDb.readAsString());
     List<Account> result = [];
-    for (var account in accounts) result.add(Account.fromJson(account));
+    for (var account in accounts) {
+      result.add(Account.fromJson(account));
+    }
     return result;
   }
 
