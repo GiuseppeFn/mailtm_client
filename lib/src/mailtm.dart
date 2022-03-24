@@ -67,7 +67,7 @@ class MailTm {
     List<Domain> domains = await getDomainsList;
     String domain = domains[_rand.nextInt(domains.length)].domain;
     String address = '$username@$domain';
-    password ??= generate_password(6);
+    password ??= generatePassword(6);
     Map response = await Requests.postRequestAccount(
       'accounts',
       address,
@@ -124,7 +124,9 @@ class MailTm {
       try {
         await customDb.writeAsString(jsonEncode(accounts));
         isSuccessfulDb = true;
-      } catch (e) {}
+      } catch (_) {
+        //Do nothing
+      }
     }
 
     return {'api': isSuccessfulApi, 'db': isSuccessfulDb};

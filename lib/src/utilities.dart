@@ -5,7 +5,7 @@ import 'dart:math';
 const _chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
 
 /// Generates a random string of [length] characters.
-String generate_password(length) {
+String generatePassword(length) {
   final Random _rand = Random.secure();
 
   return String.fromCharCodes(

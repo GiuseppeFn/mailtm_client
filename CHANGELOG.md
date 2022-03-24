@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.4
+
+- Third and last refactoring to fix analyzer issues 
+
 ## 1.0.3
 
 - Second refactoring to fix analyzer issues 
