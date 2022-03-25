@@ -1,22 +1,28 @@
-import 'dart:html' as html;
+import 'dart:html' if (dart.library.io) 'html.dart' as html;
+
+import 'implementations.dart';
 
 final html.Window window = html.window;
 
-class Platform {
-  static bool get isWeb => true;
-  static bool get isWindows => false;
-  static bool get isMacOS => false;
-  static bool get isLinux => false;
+class Platform extends PlatformInterface {
+  bool get isWeb => true;
+  bool get isWindows => false;
+  bool get isMacOS => false;
+  bool get isLinux => false;
 
-  static Map<String, String> get environment => {};
+  Map<String, String> get environment => {};
+
+  String get home => throw UnimplementedError();
+
+  Future<FileInterface> createTemp(String id) async => File(id);
 }
 
-class File {
+class File extends FileInterface {
   final String localStoragePath;
 
   String get absolutePath => localStoragePath;
 
-  File(this.localStoragePath);
+  File(this.localStoragePath) : super(localStoragePath);
 
   Future<bool> get exists => Future.value(
         html.window.localStorage.containsKey(localStoragePath),
@@ -46,7 +52,9 @@ class File {
 }
 
 class Process {
-  static Future<void> run(String cmd, List<String> args) async {
-    return;
+  Future<ProcessResult> run(String cmd, List<String> args) async {
+    return ProcessResult();
   }
 }
+
+class ProcessResult {}

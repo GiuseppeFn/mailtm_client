@@ -1,41 +1,22 @@
-import 'io.dart' if (dart.library.io) 'html.dart';
-import '../utilities.dart';
+import 'package:mailtm_client/src/io_handler/implementations.dart';
 
-class IO {
-  static void openUrl(String url) async {
-    if (Platform.isWeb) {
-      window.open(url, '_blank');
-      return;
-    }
-    String cmd;
-    if (Platform.isWindows) {
-      cmd = 'start';
-    } else if (Platform.isMacOS) {
-      cmd = 'open';
-    } else {
-      cmd = 'xdg-open';
-    }
-
-    await Process.run(cmd, [url]);
-  }
-
-  ///Gets home dir using env vars.
-  static String get homeDir =>
-      Platform.environment['HOME'] ?? Platform.environment['UserProfile']!;
-}
+import 'io_html_stub.dart'
+    if (dart.library.io) 'io.dart'
+    if (dart.library.js) 'html.dart';
 
 class Storage {
-  final File _file;
-  static bool get isWeb => Platform.isWeb;
+  final FileInterface _file;
+  static String get home => Platform().home;
+  static bool get isWeb => Platform().isWeb;
 
-  Storage({required String filePath}) : _file = File(filePath);
+  Storage({required String file}) : _file = File(file);
 
   Future<bool> get exists => _file.exists;
 
   Future<String> readAsString() => _file.readAsString();
 
   void writeAsString(String data, {bool flush: false}) =>
-      _file.writeAsString(data);
+      _file.writeAsString(data, flush: flush);
 
   Future<Storage> create({bool recursive: false}) async {
     await _file.create(recursive: recursive);
@@ -47,15 +28,29 @@ class Storage {
     return this;
   }
 
-  Storage._(this._file);
-
-  static Future<Storage> createTemp() async {
-    String id = generatePassword(16);
-    File file = await File.createTemp('$id.html');
-    return Storage._(file);
+  static Future<Storage> createTemp(String id) async {
+    FileInterface temp = await Platform().createTemp(id);
+    return Storage(file: temp.path);
   }
 
   Future<bool> delete() => _file.delete();
 
   String get absolutePath => _file.absolutePath;
+}
+
+void openUrl(String url) async {
+  if (Platform().isWeb) {
+    window.open(url, '_blank');
+    return;
+  }
+  String cmd;
+  if (Platform().isWindows) {
+    cmd = 'start';
+  } else if (Platform().isMacOS) {
+    cmd = 'open';
+  } else {
+    cmd = 'xdg-open';
+  }
+
+  Process().run(cmd, [url]);
 }

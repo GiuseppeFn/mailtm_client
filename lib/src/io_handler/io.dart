@@ -1,36 +1,51 @@
 import 'dart:io' as io;
 
+import 'package:path/path.dart';
+
+import 'implementations.dart';
+
 final Window window = Window();
 
-class Platform {
-  static bool get isWeb => false;
-  static bool get isWindows => io.Platform.isWindows;
-  static bool get isMacOS => io.Platform.isMacOS;
-  static bool get isLinux => io.Platform.isLinux;
-  static Map<String, String> get environment => io.Platform.environment;
+class Platform extends PlatformInterface {
+  bool get isWeb => false;
+  bool get isWindows => io.Platform.isWindows;
+  bool get isMacOS => io.Platform.isMacOS;
+  bool get isLinux => io.Platform.isLinux;
+  Map<String, String> get environment => io.Platform.environment;
+
+  String get home =>
+      io.Platform.environment['HOME'] ??
+      io.Platform.environment['UserProfile']!;
+
+  Future<FileInterface> createTemp(String id) async {
+    final tempDir = await io.Directory.systemTemp.createTemp(id);
+    return File(join(tempDir.path, id));
+  }
 }
 
-class File {
-  io.File file;
+class File extends FileInterface {
+  io.File _file;
 
-  String get absolutePath => file.absolute.path;
+  String get absolutePath => _file.absolute.path;
 
-  File(String path) : file = io.File(path);
+  File(String path)
+      : _file = io.File(path),
+        super(path);
 
-  Future<bool> get exists => file.exists();
+  Future<bool> get exists => _file.exists();
 
-  Future<String> readAsString() => file.readAsString();
+  Future<String> readAsString() => _file.readAsString();
 
   void writeAsString(String data, {bool flush: false}) async =>
-      await file.writeAsString(data, flush: flush);
+      await _file.writeAsString(data, flush: flush);
 
   Future<File> create({bool recursive: false}) async {
-    await file.create(recursive: recursive);
+    await _file.create(recursive: recursive);
     return this;
   }
 
   File createSync({bool recursive: false}) {
-    file.createSync(recursive: recursive);
+    _file.createSync(recursive: recursive);
     return this;
   }
 
@@ -42,7 +57,7 @@ class File {
 
   Future<bool> delete() async {
     try {
-      await file.delete();
+      await _file.delete();
       return true;
     } catch (e) {
       return false;
@@ -50,14 +65,14 @@ class File {
   }
 }
 
-class Window {
+class Window extends WindowInterface {
   void open(String url, String name, [String? options]) {
     return;
   }
 }
 
-class Process {
-  static Future<io.ProcessResult> run(String cmd, List<String> args) async {
-    return io.Process.run(cmd, args);
+class Process extends ProcessInterface {
+  void run(String cmd, List<String> args) async {
+    await io.Process.run(cmd, args);
   }
 }

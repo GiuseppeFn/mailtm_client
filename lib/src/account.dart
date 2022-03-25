@@ -90,7 +90,6 @@ class Account {
     return messages;
   }
 
-
   Future<Account> update({
     bool updateInstance: false,
     bool setAuth: false,

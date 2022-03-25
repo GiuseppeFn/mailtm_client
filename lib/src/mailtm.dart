@@ -16,7 +16,7 @@ class MailTm {
   static String apiAddress = 'https://api.mail.tm';
 
   ///Default db instance
-  static final Storage db = Storage(filePath: join(IO.homeDir, '.dartmailtm'));
+  static final Storage db = Storage(file: join(Storage.home, '.dartmailtm'));
 
   ///The database used to store accounts
   final Storage customDb;

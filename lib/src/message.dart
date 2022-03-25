@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:mailtm_client/src/utilities.dart';
+
 import 'io_handler/io_handler.dart';
 
 class Message {
@@ -26,7 +28,7 @@ class Message {
     if (Storage.isWeb) {
       throw UnsupportedError('Cannot open webpage with headers on web.');
     }
-    Storage storage = await Storage.createTemp();
+    Storage storage = await Storage.createTemp(generatePassword(16));
     String html = this.html[0].replaceAll('\n', '<br>').replaceAll('\r', '');
     storage.writeAsString('''
     <!DOCTYPE html>
@@ -43,7 +45,7 @@ class Message {
       $html</body>
     </html>
     ''', flush: true);
-    IO.openUrl('file:///${storage.absolutePath}');
+    openUrl('file:///${storage.absolutePath}');
     Future.delayed(Duration(seconds: 5)).then((_) => storage.delete());
   }
 

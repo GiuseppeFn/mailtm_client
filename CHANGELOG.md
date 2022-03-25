@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.6
+
+- Fixed support on web and conditional import errors.
+
 ## 1.0.5
 
 - Bug fixes and added Web support.
