@@ -1,10 +1,10 @@
-import 'dart:io';
 import 'dart:convert' show jsonEncode, jsonDecode;
 import 'dart:math' show Random;
 import 'package:path/path.dart' show join;
 import 'package:username_gen/username_gen.dart';
 
 import 'account.dart';
+import 'io_handler/io_handler.dart';
 import 'requests.dart';
 import 'utilities.dart';
 import 'domain.dart';
@@ -16,10 +16,10 @@ class MailTm {
   static String apiAddress = 'https://api.mail.tm';
 
   ///Default db instance
-  static final File db = File(join(homeDir, '.dartmailtm'));
+  static final Storage db = Storage(filePath: join(IO.homeDir, '.dartmailtm'));
 
   ///The database used to store accounts
-  final File customDb;
+  final Storage customDb;
 
   ///If [canSave] is true, the [MailTm] instance will store accounts on either
   ///[db] or [customDb]
@@ -27,7 +27,7 @@ class MailTm {
 
   MailTm._(this.customDb) : this.canSave = true;
 
-  MailTm({File? customDb, this.canSave: true})
+  MailTm({Storage? customDb, this.canSave: true})
       : this.customDb = customDb ?? db {
     if (!canSave) {
       return;
@@ -36,15 +36,15 @@ class MailTm {
   }
 
   ///Init a new [MailTm] instance
-  static Future<MailTm> init({File? customDb, bool canSave: true}) async {
+  static Future<MailTm> init({Storage? customDb, bool canSave: true}) async {
     if (!canSave) {
       return MailTm(canSave: false);
     }
-    if (customDb != null && !(await customDb.exists())) {
+    if (customDb != null && !await customDb.exists) {
       await customDb.create(recursive: true);
     }
 
-    if (!(await db.exists())) {
+    if (!await db.exists) {
       await db.create(recursive: true);
     }
     return MailTm._(customDb ?? db);
@@ -52,7 +52,7 @@ class MailTm {
 
   ///Gets a list of domains.
   static Future<List<Domain>> get getDomainsList async {
-    var response = await Requests.getRequest('$apiAddress/domains');
+    var response = await Requests.getRequest('domains');
     final List<Domain> res = [];
     response['hydra:member'].forEach(
       (value) => res.add(Domain.fromJson(value)),
@@ -96,7 +96,7 @@ class MailTm {
     }
     String data = (await customDb.readAsString()).trim();
     List accounts = (data != '' ? jsonDecode(data) : [])..add(account.toJson());
-    await customDb.writeAsString(jsonEncode(accounts));
+    customDb.writeAsString(jsonEncode(accounts));
     return;
   }
 
@@ -122,7 +122,7 @@ class MailTm {
       List<Account> accounts = await loadAccounts;
       accounts..removeWhere((i) => i.id == account.id);
       try {
-        await customDb.writeAsString(jsonEncode(accounts));
+        customDb.writeAsString(jsonEncode(accounts));
         isSuccessfulDb = true;
       } catch (_) {
         //Do nothing

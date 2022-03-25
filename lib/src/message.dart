@@ -1,11 +1,10 @@
-import 'dart:io';
 import 'dart:convert';
 
-import 'utilities.dart';
+import 'io_handler/io_handler.dart';
 
 class Message {
-  String id, subject, intro, text;
-  Map<String, dynamic> from;
+  final String id, subject, intro, text;
+  final Map<String, dynamic> from;
   List to, html;
   Map data;
 
@@ -24,10 +23,12 @@ class Message {
   ///saving the file the system temporary directory.
   ///And then deletes it after the browser loads the file.
   void openWeb() async {
-    Directory tempDir = await Directory.systemTemp.createTemp();
-    File temp = await File("${tempDir.path}/temp.html").create();
+    if (Storage.isWeb) {
+      throw UnsupportedError('Cannot open webpage with headers on web.');
+    }
+    Storage storage = await Storage.createTemp();
     String html = this.html[0].replaceAll('\n', '<br>').replaceAll('\r', '');
-    temp.writeAsString('''
+    storage.writeAsString('''
     <!DOCTYPE html>
     <html>
       <head>
@@ -42,8 +43,8 @@ class Message {
       $html</body>
     </html>
     ''', flush: true);
-    await openUrl('file://${temp.absolute.path}');
-    Future.delayed(Duration(seconds: 5)).then((_) => temp.delete());
+    IO.openUrl('file:///${storage.absolutePath}');
+    Future.delayed(Duration(seconds: 5)).then((_) => storage.delete());
   }
 
   ///Creates a [Message] from a [Map]

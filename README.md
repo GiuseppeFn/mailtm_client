@@ -7,7 +7,7 @@
 This package is a simple but complete mail.tm api wrapper, you can use this to save and manage your accounts, as well read all your temporary emails.
 
 ## Example
-See in [the examples folder](example/)
+See in [the example folder](example/)
 
 ## Documentation
 

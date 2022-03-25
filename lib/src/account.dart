@@ -90,10 +90,6 @@ class Account {
     return messages;
   }
 
-  ///Get request using current [Account]'s [_authHeaders]
-  ///The request is made to the [endpoint] with the [params]
-  ///[error] is the error message to throw if the request fails
-  ///[codes] is the list of status codes to accept
 
   Future<Account> update({
     bool updateInstance: false,
