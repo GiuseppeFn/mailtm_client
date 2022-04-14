@@ -9,8 +9,8 @@ import 'message.dart';
 accountFromApi(String address, String password, [String? token]) =>
     TMAccount._fromApi(address, password);
 
-TMAccount accountFromJson(Map<String, dynamic> json, String password,
-        [String? token]) =>
+TMAccount accountFromJson(
+        Map<String, dynamic> json, String password, String token) =>
     TMAccount._fromJson(json, password, token);
 
 class TMAccount {
@@ -190,6 +190,7 @@ class TMAccount {
   Map<String, dynamic> toJson() => {
         'id': id,
         'address': address,
+        'password': password,
         'quota': quota,
         'used': used,
         'isDisabled': isDisabled,

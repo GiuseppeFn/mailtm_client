@@ -134,7 +134,7 @@ class Message {
       );
 
   /// Returns the message as a map.
-  Map<String, dynamic> toMap() => {
+  Map<String, dynamic> toJson() => {
         "id": id,
         "accountId": accountId,
         "msgid": msgid,

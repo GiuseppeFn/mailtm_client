@@ -100,19 +100,19 @@ class MailTm {
   }
 
   /// Gets the auths Map.
-  Map<String, Map<String, dynamic>> get getAuths {
+  static Map<String, Map<String, dynamic>> get getAuths {
     return auths.map((key, value) => MapEntry(key, value.toJson()));
   }
 
-  void loadAuths(Map<String, Map<String, dynamic>> _auths) {
+  static void loadAuths(Map<String, dynamic> _auths) {
     for (final String id in _auths.keys) {
       auths[id] = Auth(
         accountFromJson(
-          _auths[id]!,
-          _auths[id]!['password'],
-          _auths[id]!['token'],
+          _auths[id]['account'],
+          _auths[id]['account']['password'],
+          _auths[id]['token'],
         ),
-        _auths[id]!['token'],
+        _auths[id]['token'],
       );
     }
   }
@@ -126,7 +126,8 @@ class Auth {
   Auth(this.account, this.token);
 
   Map<String, String> get headers => {'Authorization': 'Bearer $token'};
-  Map<String, dynamic> toJson() => {'account': account.toJson(), 'token': token};
+  Map<String, dynamic> toJson() =>
+      {'account': account.toJson(), 'token': token};
   @override
   String toString() => '{"account": $account, "token": "$token}';
 }

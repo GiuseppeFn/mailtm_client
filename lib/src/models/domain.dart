@@ -39,7 +39,7 @@ class Domain {
       );
 
   /// Returns the domain as a Map
-  Map<String, dynamic> toMap() => {
+  Map<String, dynamic> toJson() => {
         'id': id,
         'domain': domain,
         'isActive': isActive,
