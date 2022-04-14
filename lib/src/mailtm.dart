@@ -25,6 +25,7 @@ Future<String> getToken(String address, String password) async {
     'address': address,
     'password': password,
   });
+
   return jwt['token'];
 }
 
@@ -36,7 +37,7 @@ class MailTm {
   MailTm._();
 
   /// Creates an account with the given [username], [password] and [domain]
-  /// If they're not set, they'll be randomized.
+  /// If they're not set, they'll be randomized with a [randomStringLength] length.
   static Future<TMAccount> register({
     String? username,
     String? password,
@@ -51,6 +52,7 @@ class MailTm {
     }
     domain ??= (await Domain.domains).first;
     String address = username + '@${domain.domain}';
+
     var data = await Requests.post('/accounts', {
       'address': address,
       'password': password,

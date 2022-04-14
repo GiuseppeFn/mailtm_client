@@ -187,7 +187,7 @@ Returns ``Future<bool>`` (Must be awaited as above!)
 
   - ``String`` id: Domain's id
 
-  - ``String`` domain: The domain (example: @mailtm.com)
+  - ``String`` domain: T  he domain (example: @mailtm.com)
 
   - ``bool`` isActive: If the domain is active
 

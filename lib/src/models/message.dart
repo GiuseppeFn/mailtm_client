@@ -171,8 +171,19 @@ class Message {
       Requests.delete('/messages/$id', auths[accountId]!.headers);
 
   /// Marks the message as seen.
-  Future<bool> see() =>
-      Requests.patch('/messages/$id', auths[accountId]!.headers);
+  Future<bool> see() async {
+    try {
+      var r = await Requests.patch('/messages/$id', auths[accountId]!.headers);
+      return r;
+    } catch (e) {
+      if (e is MailException) {
+        if (e.code == 422) {
+          return true;
+        }
+      }
+      return false;
+    }
+  }
 
   /// Stringifies the message
   @override

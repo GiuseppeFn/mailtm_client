@@ -11,7 +11,6 @@ class MessageSource {
   /// Message data
   final String data;
 
-
   MessageSource._({
     required this.id,
     required this.url,

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.2
+
+- Addded an error check on message.see()
+
 ## 1.1.1
 
 - Fixed a little typo in README.

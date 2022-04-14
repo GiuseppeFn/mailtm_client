@@ -154,7 +154,7 @@ class TMAccount {
           controller.addError(e);
         }
       });
-      Timer.periodic(Duration(seconds: 10), (timer) async {
+      Timer.periodic(Duration(seconds: 3), (timer) async {
         if (controller.isClosed) {
           timer.cancel();
           await subscription.cancel();

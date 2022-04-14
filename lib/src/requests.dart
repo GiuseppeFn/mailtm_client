@@ -98,7 +98,7 @@ class Requests {
     if (response.data is String && T != String && T != bool) {
       response.data = jsonDecode(response.data.toString());
     }
-
+    response.statusCode ??= 400;
     if (response.statusCode == 400) {
       throw MailException('Invalid input', 400);
     } else if (response.statusCode == 401) {
@@ -109,8 +109,11 @@ class Requests {
       throw MailException('Unprocessable Entity', 422);
     } else if (response.statusCode == 429) {
       throw MailException('Resource already exists', 429);
-    } else if ((response.statusCode ?? 400) >= 400) {
-      throw MailException('Unknown error.', response.statusCode ?? 0);
+    } else if (response.statusCode != 200 || response.statusCode != 204) {
+      throw MailException(
+        response.statusMessage ?? 'Unknown error.',
+        response.statusCode ?? 0,
+      );
     }
     if (response.data == Map) {
       return response.data ?? {} as T;
