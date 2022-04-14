@@ -53,4 +53,9 @@ doc/api/
 
 # Support for Project snippet scope
 
+# Ignore temp test file (Used during developement only.)
+./tests/.temp_test.dart
+
+
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,dart,darteditor
+

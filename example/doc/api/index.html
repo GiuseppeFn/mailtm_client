@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="generator" content="made with love by dartdoc 4.1.0">
+  <meta name="description" content="mailtm_client API docs, for the Dart programming language.">
+  <title>mailtm_client - Dart API docs</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  
+  <link rel="stylesheet" href="static-assets/github.css?v1">
+  <link rel="stylesheet" href="static-assets/styles.css?v1">
+  <link rel="icon" href="static-assets/favicon.png?v1">
+
+  
+</head>
+
+
+<body data-base-href=""
+      data-using-base-href="false">
+
+<div id="overlay-under-drawer"></div>
+
+<header id="title">
+  <button id="sidenav-left-toggle" type="button">&nbsp;</button>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="https://github.com/GiuseppeFn/mailtm_client">mailtm_client package</a></li>
+  </ol>
+  <div class="self-name">mailtm_client</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+
+<main>
+
+
+  <div id="dartdoc-main-content" class="main-content">
+      
+<section class="desc markdown">
+  <h1 id="index">Index</h1>
+<ol>
+<li><a href="#Introduction">Introduction</a></li>
+<li><a href="#example">Example</a></li>
+<li><a href="#usage">Usage</a></li>
+</ol>
+<h2 id="introduction">Introduction</h2>
+<p>This package is a simple but complete mail.tm api wrapper, you can use this to save and manage your accounts, as well read all your temporary emails.</p>
+<h2 id="example">Example</h2>
+<p>See in <a href="example/">the example folder</a></p>
+<h2 id="documentation">Documentation</h2>
+<h3 id="mailtm-class">MailTm class</h3>
+<p>A static class,</p>
+<h4 id="create-an-account">Create an account</h4>
+<p><a href="#accounts">Go to Account section</a></p>
+<p>Creates an account, if you want, you can also provide a password! (Or not)</p>
+<p><code>await client.createAccount(password:'ah yes password');</code></p>
+<p>Returns the <code>Account</code> instance</p>
+<h3 id="account-class">Account class</h3>
+<h5 id="class-members">Class members:</h5>
+<ul>
+<li><code>String id, address, and password</code>:Account's id, address and password.</li>
+<li><code>DateTime createdAt</code>:The time when the account was created</li>
+<li><code>DateTime updatedAt</code>:The last time when the account messages were updated</li>
+<li><code>bool isDeleted</code>:Tells whenever the account is deleted</li>
+<li><code>bool isDisabled</code>:Tells whenever the account is disabled</li>
+<li><code>int quota</code>:How many bytes can be stored in the messages</li>
+<li><code>int used</code>:How many bytes are used from the quota</li>
+</ul>
+<h4 id="get-accounts-messages">Get Account's messages</h4>
+<p><a href="#messages">Go to Message section</a></p>
+<p>You can use</p>
+<p><code>await account.getMessages();</code></p>
+<p>And eventually provide a page argument.</p>
+<p>Returns <code>List&lt;Message&gt;</code></p>
+<h4 id="update-the-account-instance">Update the account instance</h4>
+<p>You can update the account instance (updatedAt, quota and used) by using:</p>
+<p><code>await account.update();</code></p>
+<p>Returns <code>TMAccount</code></p>
+<h4 id="listen-to-messages">Listen to messages</h4>
+<p>You can do so by using</p>
+<p><code>account.messages.listen((){})</code></p>
+<p>account.messages returns a stream of <code>MercureEvent</code></p>
+<h3 id="message-class">Message class</h3>
+<h5 id="class-members-2">Class members</h5>
+<ul>
+<li><code>String id, subject, intro, text</code>:The message's id, subject, intro and text!</li>
+<li><code>Map from</code>:Who sent the message. Provided as {address:'',name:''}</li>
+<li><code>List to</code>:All the receivers of the message, as a <code>List</code> of <code>Map</code>s</li>
+<li><code>List html</code>:The html. Pretty useless, if you don't want to open it in a web page.</li>
+<li><code>Map data</code>:Message attachments, like files.</li>
+</ul>
+</section>
+
+
+
+  </div> <!-- /.main-content -->
+
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+  <li><a href="https://github.com/GiuseppeFn/mailtm_client">mailtm_client package</a></li>
+</ol>
+
+
+    <h5 class="hidden-xs"><span class="package-name">mailtm_client</span> <span class="package-kind">package</span></h5>
+    <ol>
+</ol>
+
+  </div>
+
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  </div>
+
+</main>
+
+<footer>
+  <span class="no-break">
+    mailtm_client
+      1.1.0
+  </span>
+
+  
+</footer>
+
+
+
+<script src="static-assets/highlight.pack.js?v1"></script>
+<script src="static-assets/script.js?v1"></script>
+
+
+
+</body>
+
+</html>
+

@@ -1,3 +1,4 @@
+# Estimated reading time: 3 minutes
 # Index
 1. [Introduction](#Introduction)
 1. [Example](#example)
@@ -12,83 +13,51 @@ See in [the example folder](example/)
 ## Documentation
 
 ### MailTm class
-
-
-#### Initiation
-
-To start, you need to instanciate the client, it can accept 2 parameters, ``canSave``, a bool that tells the class if it can save the accounts that will be created.
-
-And ``customDb``, a File, that, if ``canSave`` is true, will be used as custom db to store files, or else it will use a defaut directory ``%home%/.dartmailtm``
-
-``MailTm client = await MailTm.init(canSave: false);``
-
-If you don't need a database, and you don't want to use async/await, you can just
-
-``MailTm(canSave: false)``
-
+A static class which is mainly needed for storing, creating and loading accounts, you can load all accounts in a session by saving them with getAuths and loading them with loadAuths
 
 #### Create an account
 
 
 [Go to Account section](#accounts)
 
-Creates an account, if you want, you can also provide a password! (Or not)
 
-``await client.createAccount(password:'ah yes password');``
+To create an account you just need to use the MailTm.register method.
 
-Returns the ``Account`` instance
+Params
 
+- randomStringLength: will be used to generate a random password and/or username if not provided (10 is the default length)
 
-#### Save an account to the local database
+- username: address' username (abcdqwerty@mail.tm, here, abcdqwerty is the username)
+- password: account's password
 
-Saves the ``Account`` instance to the database
+- domain: address' domain, (like @mail.tm, must be [Domain](#domain) class), if not provided, a random one will be provided.
 
-``client.saveAccount(account);``
+``await MailTm.register(password:'ah yes password');``
 
-Returns null
+Returns the ``Future<TMAccount>`` instance (Must be awaited as above!)
 
+#### Loading an account
 
-#### Load an account
+[Go to Account section](#accounts)
 
-You can load an account from the local database (you can specify the index) by doing this
+You can load an account by using the MailTm.login method
 
-``await client.loadAccount(index: 4);``
+If you provide the id and it is present in the saved accounts it will return the saved account instance (Useful if you don't want to make another api request)
 
-or the id, address and password, and load from API
+If you don't, and you provide address and password it will retrieve the account from the api's
 
-``await client.loadAccount(id:'',address:'',password:'');``
+If nothing is provided/the provided parameters are not valid and elseNew is true a new account will be returned (Default true)
 
-Returns the loaded ``Account``
-
-
-#### Load all the account
-
-``await client.loadAccounts``
-
-Returns ``List<Account>``
-
-
-#### Delete an account
-
-You can delete an account by using
-
-``await client.deleteAccount(account);``
-
-You could also use ``await account.delete()`` if you don't want to delete it from the local database. 
-
-Returns ``Map<String, bool>``, with two keys: ``isSuccessfulApi``, ``isSuccessfulDb``.
-
-``isSuccessfulDb`` will be ``false`` if canSave is ``false``
-
+If nothing is provided and elseNew is false, throws MailError with code -1 (Invalid arguments)
 
 ### Account class
 
 ##### Class members:
 
 - ``String id, address, and password``:Account's id, address and password.
-- ``DateTime _createdAt``:The time when the account was created
-- ``DateTime _updatedAt``:The last time when the account messages were updated 
--  ``bool _isDeleted_``:Tells whenever the account is deleted
+- ``DateTime createdAt``:The time when the account was created
+- ``DateTime updatedAt``:The last time when the account messages were updated 
+-  ``bool isDeleted``:Tells whenever the account is deleted
 -  ``bool isDisabled ``:Tells whenever the account is disabled
 -  ``int quota``:How many bytes can be stored in the messages
 -  ``int used``:How many bytes are used from the quota
@@ -102,43 +71,137 @@ You can use
 
 ``await account.getMessages();``
 
-And eventually provide a page argument.
-
-Returns ``List<Message>``
+Returns ``Future<List<Message>>`` (Must be awaited as above!)
 
 
 #### Update the account instance
 
-You can update the account instance (For example, updatedAt, etc.) by using:
+You can update the account instance (updatedAt, quota and used) by using:
 
-``await account.update(updateInstance: true);``
+``await account.update();``
 
-If updateInstance is false you can get the new updated value from the returned ``Account`` instance
+Returns ``Future<TMAccount>`` (Must be awaited as above!) 
 
-Returns ``Account``
+#### Delete the account
+
+You can do so by doing 
+
+``await account.delete()``
+
+Returns ``Future<bool>`` (Must be awaited as above!) 
+
+ACHTUNG: Be careful to not use the account after it has been deleted, or else errors will be thrown anytime you will try to use account's methods (Same thing for account's messages)
+
+Only access members! 
+
 
 #### Listen to messages
+
+[Go to Message section](#messages)
 
 You can do so by using
 
 ``account.messages.listen((){})``
 
-account.messages returns a stream of ``Message``
+account.messages returns a stream of ``Messages``
 
 ### Message class
 
 ##### Class members
 
-- ``String id, subject, intro, text``:The message's id, subject, intro and text!
-- ``Map from``:Who sent the message. Provided as {address:'',name:''}
-- ``List to``:All the receivers of the message, as a ``List`` of ``Map``s
-- ``List html``:The html. Pretty useless, if you don't want to open it in a web page.
-- ``Map data``:Message attachments, like files.
+  - ``String`` id:The unique identifier of the message (MailTm DB).
 
-#### Open the message in a web page
+  - ``String`` accountId:The unique identifier of the account.
 
-You can open the message in a web page by doing:
+  - ``String`` msgid:The unique identifier of the message (Global, both the sender service and MailTm will know this).
 
-``message.openWeb()``
+  - ``String`` intro:The introduction of the message.
 
-Returns null.
+  - ``Map<String, dynamic>`` from:The sender of the message.
+
+  - ``List<Map<String, dynamic>>`` to:The recipients of the message.
+
+  - ``List<String>`` cc:The carbon copy recipients of the message.
+
+  - ``List<String>`` bcc:The blind carbon copy recipients of the message.
+
+  - ``String`` subject:The subject of the message.
+
+  - ``bool`` seen:Whether the message has been seen.
+
+  - ``bool`` flagged:Whether the message has been flagged.
+
+  - ``bool`` isDeleted:Whether the message has been deleted.
+
+  - ``List<String>`` verifications:The verifications of the message.
+
+  - ``bool`` retention:If the message has arrived
+
+  - ``DateTime`` retentionDate:The date of the message retention.
+
+  - ``String`` text:The text of the message.
+
+  - ``List<String>`` html:The HTML of the message.
+
+  - ``bool`` hasAttachments:Whether the message has attachments.
+
+  - ``List<Attachment>`` attachments:List of the message.
+
+  - ``int`` size:The size of the message.
+
+  - ``String`` url:The downloadUrl of the message.
+
+  - ``DateTime`` createdAt:The date of the message creation.
+
+  - ``DateTime`` updatedAt:When the message was seen
+
+#### Download the message
+
+As simple as:
+
+``await message.download();``
+
+Returns ``Future<MessageSource>`` (Must be awaited as above!)
+
+#### Delete the message
+
+Simply: 
+
+``await message.delete();``
+
+Returns ``Future<bool>`` (Must be awaited as above!)
+
+
+#### Mark the message as seen:
+
+You can do so by:
+
+``await message.seen();``
+
+Returns ``Future<bool>`` (Must be awaited as above!)
+
+
+### Domain
+
+#### Class members
+
+  - ``String`` id:Domain's id
+
+  - ``String`` domain:the domain (example: @mailtm.com)
+
+  - ``bool`` isActive:If the domain is active
+
+  - ``bool`` isPrivate:If the domain is private
+
+  - ``DateTime`` createdAt:When the domain was created
+
+  - ``DateTime`` updatedAt:When the domain was updated
+  
+#### Get all domains
+
+You can do so by:
+
+``await Domain.domains;``
+
+Returns ``Future<List<Domain>>`` (Must be awaited as above!)
+

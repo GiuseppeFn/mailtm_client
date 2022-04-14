@@ -1,167 +1,132 @@
-import 'dart:convert' show jsonEncode, jsonDecode;
-import 'dart:math' show Random;
-import 'package:path/path.dart' show join;
-import 'package:username_gen/username_gen.dart';
+import 'dart:async';
+import 'dart:math';
 
-import 'account.dart';
-import 'io_handler/io_handler.dart';
-import 'requests.dart';
-import 'utilities.dart';
-import 'domain.dart';
+import '/src/models/account.dart';
+import '/src/models/domain.dart';
+import '/src/requests.dart';
 
+/// All the usable characters for a random username/password
+const String _charset =
+    '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+
+/// Generate a random string of [length] characters
+String randomString(int length) {
+  final _random = Random.secure();
+  final _codeUnits = List<int>.generate(
+    length,
+    (index) => _charset.codeUnitAt(_random.nextInt(_charset.length)),
+  );
+  return String.fromCharCodes(_codeUnits);
+}
+
+/// Gets the token for the given [address] and [password] from API
+Future<String> getToken(String address, String password) async {
+  var jwt = await Requests.post('/token', {
+    'address': address,
+    'password': password,
+  });
+  return jwt['token'];
+}
+
+/// A map which contains all the accounts and authorizations
+Map<String, Auth> auths = {};
+
+/// MailTm client (constant)
 class MailTm {
-  static final Random _rand = Random.secure();
+  MailTm._();
 
-  ///[MailTm] api domain
-  static String apiAddress = 'https://api.mail.tm';
-
-  ///Default db instance
-  static final Storage db = Storage(file: join(Storage.home, '.dartmailtm'));
-
-  ///The database used to store accounts
-  final Storage customDb;
-
-  ///If [canSave] is true, the [MailTm] instance will store accounts on either
-  ///[db] or [customDb]
-  final bool canSave;
-
-  MailTm._(this.customDb) : this.canSave = true;
-
-  MailTm({Storage? customDb, this.canSave: true})
-      : this.customDb = customDb ?? db {
-    if (!canSave) {
-      return;
+  /// Creates an account with the given [username], [password] and [domain]
+  /// If they're not set, they'll be randomized.
+  static Future<TMAccount> register({
+    String? username,
+    String? password,
+    Domain? domain,
+    int randomStringLength = 10,
+  }) async {
+    if (username == null || username.isEmpty) {
+      username = randomString(randomStringLength);
     }
-    this.customDb.createSync(recursive: true);
-  }
-
-  ///Init a new [MailTm] instance
-  static Future<MailTm> init({Storage? customDb, bool canSave: true}) async {
-    if (!canSave) {
-      return MailTm(canSave: false);
+    if (password == null || password.isEmpty) {
+      password = randomString(randomStringLength);
     }
-    if (customDb != null && !await customDb.exists) {
-      await customDb.create(recursive: true);
-    }
+    domain ??= (await Domain.domains).first;
+    String address = username + '@${domain.domain}';
+    var data = await Requests.post('/accounts', {
+      'address': address,
+      'password': password,
+    });
 
-    if (!await db.exists) {
-      await db.create(recursive: true);
-    }
-    return MailTm._(customDb ?? db);
-  }
-
-  ///Gets a list of domains.
-  static Future<List<Domain>> get getDomainsList async {
-    var response = await Requests.getRequest('domains');
-    final List<Domain> res = [];
-    response['hydra:member'].forEach(
-      (value) => res.add(Domain.fromJson(value)),
-    );
-    return res;
-  }
-
-  ///Creates a new account on MailTm and parses it as [Account], then saves it
-  ///using [saveAccount].
-  Future<Account> createAccount({String? password}) async {
-    String username = UsernameGen().generate().toLowerCase();
-    List<Domain> domains = await getDomainsList;
-    String domain = domains[_rand.nextInt(domains.length)].domain;
-    String address = '$username@$domain';
-    password ??= generatePassword(6);
-    Map response = await Requests.postRequestAccount(
-      'accounts',
-      address,
-      password,
-      error: 'Could not get an account.',
-    );
-    Account account = await Account.create(
-      id: response['id'],
-      address: response['address'],
-      password: password,
-      quota: response['quota'],
-      used: response['used'],
-      isDisabled: response['isDisabled'],
-      isDeleted: response['isDeleted'],
-      createdAt: DateTime.parse(response['createdAt']),
-      updatedAt: DateTime.parse(response['updatedAt']),
-    );
-    saveAccount(account);
+    String token = await getToken(data['address'], password);
+    var account = accountFromJson(data, password, token);
+    auths[data['id']] = Auth(account, token);
     return account;
   }
 
-  ///Saves a new [Account] to the db, if [canSave] is true
-  void saveAccount(Account account) async {
-    if (!canSave) {
-      return;
-    }
-    String data = (await customDb.readAsString()).trim();
-    List accounts = (data != '' ? jsonDecode(data) : [])..add(account.toJson());
-    customDb.writeAsString(jsonEncode(accounts));
-    return;
-  }
-
-  ///Loads all the accounts from the [customDb] or [db]
-  ///If [canSave] is false, an exception is thrown.
-  Future<List<Account>> get loadAccounts async {
-    if (!canSave) {
-      throw Exception('Cannot load accounts without the "Save" feature.');
-    }
-    List<dynamic> accounts = jsonDecode(await customDb.readAsString());
-    List<Account> result = [];
-    for (var account in accounts) {
-      result.add(Account.fromJson(account));
-    }
-    return result;
-  }
-
-  ///Deletes the account by doing a DELETE request to the API
-  Future<Map<String, bool>> deleteAccount(Account account) async {
-    bool isSuccessfulApi = await account.delete();
-    bool isSuccessfulDb = false;
-    if (isSuccessfulApi && canSave) {
-      List<Account> accounts = await loadAccounts;
-      accounts..removeWhere((i) => i.id == account.id);
-      try {
-        customDb.writeAsString(jsonEncode(accounts));
-        isSuccessfulDb = true;
-      } catch (_) {
-        //Do nothing
-      }
-    }
-
-    return {'api': isSuccessfulApi, 'db': isSuccessfulDb};
-  }
-
-  ///Loads the [Account] with the given [index] from [customDb] or [db].
-  ///If [canSave] is false, an exception is thrown.
-  Future<Account> loadAccount({
-    int index: 0,
+  /// Gets the account with the given [id] (Retrieved from [auths])
+  /// If [auths] doesn't contain the id, then [address] and [password] are required
+  /// to load the account from api
+  /// if then, the account isn't retrieved and [elseNew] is true a new account is created
+  /// or else, an exception is thrown.
+  static FutureOr<TMAccount> login({
     String? id,
     String? address,
     String? password,
+    bool elseNew: true,
   }) async {
-    final bool forceApi = id != null && address != null && password != null;
-    assert(!canSave && !forceApi);
-    assert((!canSave || forceApi) &&
-        (id != null && address != null && password != null));
-    if (!canSave || forceApi) {
-      Account account = await Account.create(
-        id: id!,
-        address: address!,
-        password: password!,
-      );
-      return account.update();
+    assert(
+      id != null || (address != null && password != null) || elseNew,
+      'Either id or address and password must be provided',
+    );
+    if (id != null && auths.containsKey(id)) {
+      return auths[id]!.account;
     }
-    List<dynamic> data = jsonDecode(await customDb.readAsString());
-
-    return Account.fromJson(data[index]);
+    TMAccount account;
+    if (address != null && password != null) {
+      String token = await getToken(address, password);
+      account = await accountFromApi(address, password);
+      auths[account.id] = Auth(account, token);
+      return account;
+    }
+    if (elseNew) {
+      address ??= '';
+      account =
+          await register(username: address.split('@')[0], password: password);
+      String token = await getToken(account.address, account.password);
+      auths[account.id] = Auth(account, token);
+      return account;
+    } else {
+      throw MailException('Invalid arguments', -1);
+    }
   }
 
+  /// Gets the auths Map.
+  Map<String, Map<String, dynamic>> get getAuths {
+    return auths.map((key, value) => MapEntry(key, value.toJson()));
+  }
+
+  void loadAuths(Map<String, Map<String, dynamic>> _auths) {
+    for (final String id in _auths.keys) {
+      auths[id] = Auth(
+        accountFromJson(
+          _auths[id]!,
+          _auths[id]!['password'],
+          _auths[id]!['token'],
+        ),
+        _auths[id]!['token'],
+      );
+    }
+  }
+}
+
+/// Class for store accounts and relative token
+class Auth {
+  TMAccount account;
+  String token;
+
+  Auth(this.account, this.token);
+
+  Map<String, String> get headers => {'Authorization': 'Bearer $token'};
+  Map<String, dynamic> toJson() => {'account': account.toJson(), 'token': token};
   @override
-  String toString() {
-    return '''MailTm(
-      apiAddress: $apiAddress, 
-      canSave: $canSave
-)''';
-  }
+  String toString() => '{"account": $account, "token": "$token}';
 }

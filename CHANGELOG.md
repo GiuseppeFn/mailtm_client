@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.0
+
+- Complete code refactor.
+
 ## 1.0.6
 
 - Fixed support on web and conditional import errors.

@@ -2,74 +2,121 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 
-import 'mailtm.dart';
+/// Requests base url
+const String _baseUrl = 'https://api.mail.tm';
 
+/// Dio client
+late final Dio _dio = Dio(BaseOptions(
+  baseUrl: _baseUrl,
+  contentType: 'application/json',
+  validateStatus: (int? status) => (status ?? 400) < 500,
+));
+
+/// Client's exception class.
+/// If you want to see what corresponds to the error codes see [Requests.request]
+class MailException implements Exception {
+  final String message;
+  final int code;
+
+  MailException(this.message, this.code);
+
+  @override
+  String toString() => code.toString() + ': ' + message;
+}
+
+/// Class for handling requests.
 class Requests {
-  ///Makes a post request using the given [endpoint] on the account
-  ///[address] and [password]
-  ///[error] is the error message to throw if the request fails
-  ///[codes] is the list of status codes to accept
+  /// get requests
+  /// Accepts only headers (optional)
+  static Future<T> get<T>(String endpoint, [Map<String, String>? headers]) =>
+      request<T>(endpoint, 'GET', headers: headers);
 
-  static Future<Map<String, dynamic>> postRequestAccount(
+  /// post requests
+  /// Accepts only the data (body) of the request
+  static Future<Map<String, dynamic>> post(
     String endpoint,
-    address,
-    password, {
-    String? error,
-    List<int>? codes,
-  }) async {
-    Map<String, String> headers = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/ld+json',
-    };
-    var response = await Dio().post(
-      "${MailTm.apiAddress}/$endpoint",
-      data: {
-        'address': address,
-        'password': password,
-      },
-      options: Options(headers: headers),
-    );
-    if (!(codes ?? [200, 201]).contains(response.statusCode)) {
-      throw Exception(error ?? 'Error doing request.');
-    }
-    if (response.data is String) {
-      response.data = jsonDecode(response.data);
-    }
-    return Map<String, dynamic>.from(response.data);
-  }
+    Map<String, String> data,
+  ) =>
+      request<Map<String, dynamic>>(endpoint, 'POST', data: data);
 
-  ///Makes a get request using the given [endpoint]
-  ///[error] is the error message to throw if the request fails
-  ///[codes] is the list of status codes to accept
-  static Future<Map<String, dynamic>> getRequest(
-    String endpoint, {
-    Map<String, dynamic>? params,
-    String? error,
-    List<int>? codes,
-    Map<String, dynamic>? headers,
-  }) async {
-    var response = await Dio().get(
-      "${MailTm.apiAddress}/$endpoint",
-      queryParameters: params,
-      options: Options(headers: headers),
-    );
-
-    if (!(codes ?? [200, 201]).contains(response.statusCode)) {
-      throw Exception(error ?? 'Error doing request.');
-    }
-
-    return jsonDecode(response.data);
-  }
-
-  ///Deletes the account by doing a DELETE request to the API
-  static Future<int> delete(
+  /// patch requests
+  /// Accepts only the headers
+  static Future<bool> patch(
     String endpoint,
-    Map<String, dynamic> headers,
+    Map<String, String> headers,
   ) async {
-    var response = await Dio().delete(
-      "${MailTm.apiAddress}/$endpoint",
-      options: Options(headers: headers),
-    );
-    return response.statusCode ?? 404;
+    await request(endpoint, 'PATCH', headers: headers);
+    return true;
+  }
+
+  /// delete requests
+  /// Accepts only the headers.
+  static Future<bool> delete(
+    String endpoint,
+    Map<String, String> headers,
+  ) async =>
+      request<bool>(endpoint, 'DELETE', headers: headers);
+
+  /// request method for handling requests.
+  /// Accepts the endpoint, method and optional headers and data.
+  static Future<T> request<T>(
+    String endpoint,
+    String method, {
+    Map<String, String>? data,
+    Map<String, String>? headers,
+  }) async {
+    headers ??= {};
+    headers['Accept'] = 'application/json';
+    Response response;
+    int statusCode;
+    do {
+      try {
+        response = await _dio.request(
+          endpoint,
+          data: data,
+          options: Options(method: method, headers: headers),
+        );
+        statusCode = response.statusCode ?? 0;
+        if (statusCode == 429) {
+          await Future.delayed(Duration(seconds: 1));
+        }
+      } on DioError catch (e) {
+        int? statusCode = e.response?.statusCode;
+        String? message = e.response?.statusMessage ?? e.message;
+
+        throw MailException(message, statusCode ?? 0);
+      }
+    } while (statusCode == 429);
+
+    if (response.data == '') {
+      throw MailException('No data', response.statusCode ?? 0);
+    }
+
+    if (T == bool && method == 'DELETE') {
+      response.data = response.statusCode == 204;
+    }
+    if (response.data is String && T != String && T != bool) {
+      response.data = jsonDecode(response.data.toString());
+    }
+
+    if (response.statusCode == 400) {
+      throw MailException('Invalid input', 400);
+    } else if (response.statusCode == 401) {
+      throw MailException('Invalid credentials.', 401);
+    } else if (response.statusCode == 404) {
+      throw MailException('Resource not found', 404);
+    } else if (response.statusCode == 422) {
+      throw MailException('Unprocessable Entity', 422);
+    } else if (response.statusCode == 429) {
+      throw MailException('Resource already exists', 429);
+    } else if ((response.statusCode ?? 400) >= 400) {
+      throw MailException('Unknown error.', response.statusCode ?? 0);
+    }
+    if (response.data == Map) {
+      return response.data ?? {} as T;
+    } else if (response.data == List) {
+      return response.data ?? [] as T;
+    }
+    return response.data as T;
   }
 }
