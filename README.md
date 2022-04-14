@@ -32,7 +32,7 @@ Params
 
 - domain: address' domain, (like @mail.tm, must be [Domain](#domain) class), if not provided, a random one will be provided.
 
-``await MailTm.register(password:'ah yes password');``
+``await MailTm.register(password: 'ah yes password');``
 
 Returns the ``Future<TMAccount>`` instance (Must be awaited as above!)
 
@@ -54,13 +54,13 @@ If nothing is provided and elseNew is false, throws MailError with code -1 (Inva
 
 ##### Class members:
 
-- ``String id, address, and password``:Account's id, address and password.
-- ``DateTime createdAt``:The time when the account was created
-- ``DateTime updatedAt``:The last time when the account messages were updated 
--  ``bool isDeleted``:Tells whenever the account is deleted
--  ``bool isDisabled ``:Tells whenever the account is disabled
--  ``int quota``:How many bytes can be stored in the messages
--  ``int used``:How many bytes are used from the quota
+- ``String id, address, and password``: Account's id, address and password.
+- ``DateTime createdAt``: The time when the account was created
+- ``DateTime updatedAt``: The last time when the account messages were updated 
+-  ``bool isDeleted``: Tells whenever the account is deleted
+-  ``bool isDisabled ``: Tells whenever the account is disabled
+-  ``int quota``: How many bytes can be stored in the messages
+-  ``int used``: How many bytes are used from the quota
 
 
 #### Get Account's messages
@@ -109,51 +109,51 @@ account.messages returns a stream of ``Messages``
 
 ##### Class members
 
-  - ``String`` id:The unique identifier of the message (MailTm DB).
+  - ``String`` id: The unique identifier of the message (MailTm DB).
 
-  - ``String`` accountId:The unique identifier of the account.
+  - ``String`` accountId: The unique identifier of the account.
 
-  - ``String`` msgid:The unique identifier of the message (Global, both the sender service and MailTm will know this).
+  - ``String`` msgid: The unique identifier of the message (Global, both the sender service and MailTm will know this).
 
-  - ``String`` intro:The introduction of the message.
+  - ``String`` intro: The introduction of the message.
 
-  - ``Map<String, dynamic>`` from:The sender of the message.
+  - ``Map<String, dynamic>`` from: The sender of the message.
 
-  - ``List<Map<String, dynamic>>`` to:The recipients of the message.
+  - ``List<Map<String, dynamic>>`` to: The recipients of the message.
 
-  - ``List<String>`` cc:The carbon copy recipients of the message.
+  - ``List<String>`` cc: The carbon copy recipients of the message.
 
-  - ``List<String>`` bcc:The blind carbon copy recipients of the message.
+  - ``List<String>`` bcc: The blind carbon copy recipients of the message.
 
-  - ``String`` subject:The subject of the message.
+  - ``String`` subject: The subject of the message.
 
-  - ``bool`` seen:Whether the message has been seen.
+  - ``bool`` seen: Whether the message has been seen.
 
-  - ``bool`` flagged:Whether the message has been flagged.
+  - ``bool`` flagged: Whether the message has been flagged.
 
-  - ``bool`` isDeleted:Whether the message has been deleted.
+  - ``bool`` isDeleted: Whether the message has been deleted.
 
-  - ``List<String>`` verifications:The verifications of the message.
+  - ``List<String>`` verifications: The verifications of the message.
 
-  - ``bool`` retention:If the message has arrived
+  - ``bool`` retention: If the message has arrived
 
-  - ``DateTime`` retentionDate:The date of the message retention.
+  - ``DateTime`` retentionDate: The date of the message retention.
 
-  - ``String`` text:The text of the message.
+  - ``String`` text: The text of the message.
 
-  - ``List<String>`` html:The HTML of the message.
+  - ``List<String>`` html: The HTML of the message.
 
-  - ``bool`` hasAttachments:Whether the message has attachments.
+  - ``bool`` hasAttachments: Whether the message has attachments.
 
-  - ``List<Attachment>`` attachments:List of the message.
+  - ``List<Attachment>`` attachments: List of the message.
 
-  - ``int`` size:The size of the message.
+  - ``int`` size: The size of the message.
 
-  - ``String`` url:The downloadUrl of the message.
+  - ``String`` url: The downloadUrl of the message.
 
-  - ``DateTime`` createdAt:The date of the message creation.
+  - ``DateTime`` createdAt: The date of the message creation.
 
-  - ``DateTime`` updatedAt:When the message was seen
+  - ``DateTime`` updatedAt: When the message was seen
 
 #### Download the message
 
@@ -185,17 +185,17 @@ Returns ``Future<bool>`` (Must be awaited as above!)
 
 #### Class members
 
-  - ``String`` id:Domain's id
+  - ``String`` id: Domain's id
 
-  - ``String`` domain:the domain (example: @mailtm.com)
+  - ``String`` domain: The domain (example: @mailtm.com)
 
-  - ``bool`` isActive:If the domain is active
+  - ``bool`` isActive: If the domain is active
 
-  - ``bool`` isPrivate:If the domain is private
+  - ``bool`` isPrivate: If the domain is private
 
-  - ``DateTime`` createdAt:When the domain was created
+  - ``DateTime`` createdAt: When the domain was created
 
-  - ``DateTime`` updatedAt:When the domain was updated
+  - ``DateTime`` updatedAt: When the domain was updated
   
 #### Get all domains
 

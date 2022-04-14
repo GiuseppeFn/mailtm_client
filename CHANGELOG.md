@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1
+
+- Fixed a little typo in README.
+
 ## 1.1.0
 
 - Complete code refactor.
