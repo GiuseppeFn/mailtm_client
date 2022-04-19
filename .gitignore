@@ -12,8 +12,12 @@ build/
 # If you're building an application, you may want to check-in your pubspec.lock
 pubspec.lock
 
+TODO.md
+
 # dotenv environment variables file
 .env*
+
+
 
 # Avoid committing generated Javascript files:
 *.dart.js

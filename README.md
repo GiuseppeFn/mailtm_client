@@ -10,15 +10,15 @@ This package is a simple but complete mail.tm api wrapper, you can use this to s
 ## Example
 See in [the example folder](example/)
 
-## Documentation
+## Usage
 
-### MailTm class
+### MailTm 
 A static class which is mainly needed for storing, creating and loading accounts, you can load all accounts in a session by saving them with getAuths and loading them with loadAuths
 
 #### Create an account
 
 
-[Go to Account section](#accounts)
+[Go to Account section](#account)
 
 
 To create an account you just need to use the MailTm.register method.
@@ -38,7 +38,7 @@ Returns the ``Future<TMAccount>`` instance (Must be awaited as above!)
 
 #### Loading an account
 
-[Go to Account section](#accounts)
+[Go to Account section](#account)
 
 You can load an account by using the MailTm.login method
 
@@ -50,7 +50,7 @@ If nothing is provided/the provided parameters are not valid and elseNew is true
 
 If nothing is provided and elseNew is false, throws MailError with code -1 (Invalid arguments)
 
-### Account class
+### Account
 
 ##### Class members:
 
@@ -65,7 +65,7 @@ If nothing is provided and elseNew is false, throws MailError with code -1 (Inva
 
 #### Get Account's messages
 
-[Go to Message section](#messages)
+[Go to Message section](#message)
 
 You can use 
 
@@ -97,7 +97,7 @@ Only access members!
 
 #### Listen to messages
 
-[Go to Message section](#messages)
+[Go to Message section](#message)
 
 You can do so by using
 
@@ -105,7 +105,7 @@ You can do so by using
 
 account.messages returns a stream of ``Messages``
 
-### Message class
+### Message
 
 ##### Class members
 

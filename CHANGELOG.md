@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.0
+
+ - Fixed some errors and implemented attachment downloading. Added MailTm.accounts
+
 ## 1.1.3
 
 - Minor fixes

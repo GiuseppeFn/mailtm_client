@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import '../mailtm.dart';
 import '../requests.dart';
 
@@ -56,9 +58,9 @@ class Attachment {
         accountId: accountId,
       );
 
-  /// Downloads the attachment as String
-  Future<String> download() =>
-      Requests.get<String>(url, auths[_accountId]!.headers);
+  /// Downloads the attachment
+  Future<Uint8List> download() =>
+      Requests.download(url, auths[_accountId]!.headers);
 
   /// Download the attachment from the server.
   static Future<String> fromUrl(String url) => Requests.get<String>(url);

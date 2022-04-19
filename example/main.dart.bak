@@ -10,7 +10,7 @@ void main() async {
     print('Listened to message with id: $e');
     if (e.hasAttachments) {
       print('Message has following attachments:');
-      e.attachments.forEach((a) => print('- $a'));
+      e.attachments.forEach((a) => print('- ${a.name}'));
     }
     await subscription.cancel();
   });

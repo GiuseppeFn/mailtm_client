@@ -101,6 +101,9 @@ class MailTm {
     }
   }
 
+  static List<TMAccount> get accounts =>
+      auths.values.map((auth) => auth.account).toList();
+
   /// Gets the auths Map.
   static Map<String, Map<String, dynamic>> get getAuths {
     return auths.map((key, value) => MapEntry(key, value.toJson()));

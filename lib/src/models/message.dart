@@ -39,7 +39,7 @@ class Message {
   final String accountId;
 
   /// The unique identifier of the message
-  /// (Global, for example, both Gmail and MailTm will know this).
+  /// (Global, both the receiver service and MailTm will know this).
   final String msgid;
 
   /// The introduction of the message.
@@ -162,7 +162,8 @@ class Message {
 
   /// Downloads the message as [MessageSource]
   Future<MessageSource> download() async {
-    var r = await Requests.get('/sources/$id', auths[accountId]!.headers);
+    var r = await Requests.get<Map>('/sources/$id', auths[accountId]!.headers)
+        as Map<String, dynamic>;
     return messageSourceFromJson(r);
   }
 
