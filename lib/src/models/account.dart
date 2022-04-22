@@ -94,34 +94,51 @@ class TMAccount {
   /// Deletes the account
   /// Be careful to not use an account after it is been deleted
   Future<bool> delete() async {
-    bool r = await Requests.delete('/accounts/$id', auths[id]!.headers);
+    bool r = await Requests.delete('/accounts/$id', auth);
     if (r) {
       auths.remove(id);
     }
     return r;
   }
 
-  /// Returns the account's messages
-  Future<List<Message>> getMessages() async {
-    var msgs = await Requests.get<List>('/messages', auths[id]!.headers);
-    final List<Message> result = [];
-    for (int i = 0; i < msgs.length; ++i) {
+  /// Returns all the account's messages
+  Future<List<TMMessage>> getAllMessages() async {
+    var response = await Requests.get<Map>('/messages?page=1', auth, false);
+    int iterations = ((response["hydra:totalItems"] / 30) as double).ceil();
+    if (iterations == 1) {
+      return _getMessages(-1, response);
+    }
+
+    final List<TMMessage> result = [];
+    for (int page = 2; page <= iterations; ++page) {
+      result.addAll(await getMessages(page));
+    }
+    return result;
+  }
+
+  /// Private function, returns one page of the account messages
+  /// Private as it accepts a response, to avoid multiple requests from the getAllMessages function
+  Future<List<TMMessage>> _getMessages(int page, [Map? response]) async {
+    response ??= await Requests.get<Map>('/messages?page=$page ', auth, false);
+    final List<TMMessage> result = [];
+    var member = response["hydra:member"];
+    for (int i = 0; i < member.length; i++) {
       Map<String, dynamic> data = await Requests.get<Map>(
-        '/messages/${msgs[i]['id']}',
-        auths[id]!.headers,
+        '/messages/${member[i]['id']}',
+        auth,
       ) as Map<String, dynamic>;
-      data['intro'] = msgs[i]['intro'];
+      data['intro'] = member[i]['intro'];
       result.add(messageFromJson(data));
     }
     return result;
   }
 
+  /// Returns one page the account's messages (30 per page)
+  Future<List<TMMessage>> getMessages([int page = 1]) => _getMessages(page);
+
   /// Updates the account instance and returns it
   Future<TMAccount> update() async {
-    var data = await Requests.get<Map<String, dynamic>>(
-      '/me',
-      auths[id]!.headers,
-    );
+    var data = await Requests.get<Map<String, dynamic>>('/me', auth);
 
     TMAccount account = TMAccount._fromJson(data, password);
     quota = account.quota;
@@ -133,9 +150,9 @@ class TMAccount {
     return account;
   }
 
-  /// A stream of [Message]
-  Stream<Message> get messages {
-    late StreamController<Message> controller;
+  /// A stream of [TMMessage]
+  Stream<TMMessage> get messages {
+    late StreamController<TMMessage> controller;
     bool canYield = true;
 
     void tick() async {
@@ -156,7 +173,7 @@ class TMAccount {
           }
           Map<String, dynamic> data = await Requests.get<Map>(
             '/messages/${encodedData['id']}',
-            auths[id]!.headers,
+            auth,
           ) as Map<String, dynamic>;
           data['intro'] = encodedData['intro'];
           controller.add(messageFromJson(data));
@@ -187,7 +204,7 @@ class TMAccount {
       return;
     }
 
-    controller = StreamController<Message>(
+    controller = StreamController<TMMessage>(
       onListen: listen,
       onPause: pause,
       onResume: listen,
@@ -208,6 +225,14 @@ class TMAccount {
         'createdAt': createdAt.toIso8601String(),
         'updatedAt': updatedAt.toIso8601String(),
       };
+  Map<String, String> get auth => auths[id]!.headers;
+
+  @override
+  operator ==(Object other) =>
+      identical(this, other) || other is TMAccount && id == other.id;
+
+  @override
+  int get hashCode => id.hashCode;
 
   @override
   String toString() => address;

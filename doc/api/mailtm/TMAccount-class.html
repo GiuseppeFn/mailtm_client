@@ -70,6 +70,17 @@
 
 </dd>
 
+        <dt id="auth" class="property">
+  <span class="name"><a href="../mailtm/TMAccount/auth.html">auth</a></span>
+  <span class="signature">&#8594; <a href="https://api.dart.dev/dev/2.18.0-9.0.dev/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/dev/2.18.0-9.0.dev/dart-core/String-class.html">String</a></span>, <span class="type-parameter"><a href="https://api.dart.dev/dev/2.18.0-9.0.dev/dart-core/String-class.html">String</a></span>&gt;</span></span> 
+
+</dt>
+<dd>
+  
+  <div class="features">read-only</div>
+
+</dd>
+
         <dt id="createdAt" class="property">
   <span class="name"><a href="../mailtm/TMAccount/createdAt.html">createdAt</a></span>
   <span class="signature">&#8594; <a href="https://api.dart.dev/dev/2.18.0-9.0.dev/dart-core/DateTime-class.html">DateTime</a></span> 
@@ -81,14 +92,14 @@
 
 </dd>
 
-        <dt id="hashCode" class="property inherited">
-  <span class="name"><a href="https://api.dart.dev/dev/2.18.0-9.0.dev/dart-core/Object/hashCode.html">hashCode</a></span>
+        <dt id="hashCode" class="property">
+  <span class="name"><a href="../mailtm/TMAccount/hashCode.html">hashCode</a></span>
   <span class="signature">&#8594; <a href="https://api.dart.dev/dev/2.18.0-9.0.dev/dart-core/int-class.html">int</a></span> 
 
 </dt>
-<dd class="inherited">
+<dd>
   The hash code for this object.
-  <div class="features">read-only, inherited</div>
+  <div class="features">read-only, override</div>
 
 </dd>
 
@@ -127,11 +138,11 @@
 
         <dt id="messages" class="property">
   <span class="name"><a href="../mailtm/TMAccount/messages.html">messages</a></span>
-  <span class="signature">&#8594; <a href="https://api.dart.dev/dev/2.18.0-9.0.dev/dart-async/Stream-class.html">Stream</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../mailtm/Message-class.html">Message</a></span>&gt;</span></span> 
+  <span class="signature">&#8594; <a href="https://api.dart.dev/dev/2.18.0-9.0.dev/dart-async/Stream-class.html">Stream</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../mailtm/TMMessage-class.html">TMMessage</a></span>&gt;</span></span> 
 
 </dt>
 <dd>
-  A stream of <code>Message</code>
+  A stream of <code>TMMessage</code>
   <div class="features">read-only</div>
 
 </dd>
@@ -214,15 +225,28 @@ Be careful to not use an account after it is been deleted
 
 </dd>
 
-        <dt id="getMessages" class="callable">
-  <span class="name"><a href="../mailtm/TMAccount/getMessages.html">getMessages</a></span><span class="signature">(<wbr>)
-    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/2.18.0-9.0.dev/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/dev/2.18.0-9.0.dev/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../mailtm/Message-class.html">Message</a></span>&gt;</span></span>&gt;</span></span>
+        <dt id="getAllMessages" class="callable">
+  <span class="name"><a href="../mailtm/TMAccount/getAllMessages.html">getAllMessages</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/2.18.0-9.0.dev/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/dev/2.18.0-9.0.dev/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../mailtm/TMMessage-class.html">TMMessage</a></span>&gt;</span></span>&gt;</span></span>
   </span>
   
 
 </dt>
 <dd>
-  Returns the account's messages
+  Returns all the account's messages
+  
+
+</dd>
+
+        <dt id="getMessages" class="callable">
+  <span class="name"><a href="../mailtm/TMAccount/getMessages.html">getMessages</a></span><span class="signature">(<wbr><span class="parameter" id="getMessages-param-page">[<span class="type-annotation"><a href="https://api.dart.dev/dev/2.18.0-9.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">page</span> = <span class="default-value">1</span>]</span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/2.18.0-9.0.dev/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/dev/2.18.0-9.0.dev/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../mailtm/TMMessage-class.html">TMMessage</a></span>&gt;</span></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Returns one page the account's messages (30 per page)
   
 
 </dd>
@@ -283,20 +307,20 @@ Be careful to not use an account after it is been deleted
   </section>
     
   <section
-      class="summary offset-anchor inherited"
+      class="summary offset-anchor"
       id="operators">
     <h2>Operators</h2>
     <dl class="callables">
-        <dt id="operator ==" class="callable inherited">
-  <span class="name"><a href="https://api.dart.dev/dev/2.18.0-9.0.dev/dart-core/Object/operator_equals.html">operator ==</a></span><span class="signature">(<wbr><span class="parameter" id="==-param-other"><span class="type-annotation"><a href="https://api.dart.dev/dev/2.18.0-9.0.dev/dart-core/Object-class.html">Object</a></span> <span class="parameter-name">other</span></span>)
+        <dt id="operator ==" class="callable">
+  <span class="name"><a href="../mailtm/TMAccount/operator_equals.html">operator ==</a></span><span class="signature">(<wbr><span class="parameter" id="==-param-other"><span class="type-annotation"><a href="https://api.dart.dev/dev/2.18.0-9.0.dev/dart-core/Object-class.html">Object</a></span> <span class="parameter-name">other</span></span>)
     <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/2.18.0-9.0.dev/dart-core/bool-class.html">bool</a></span>
   </span>
   
 
 </dt>
-<dd class="inherited">
+<dd>
   The equality operator.
-  <div class="features">inherited</div>
+  <div class="features">override</div>
 
 </dd>
 
@@ -326,12 +350,12 @@ Be careful to not use an account after it is been deleted
     <h5>mailtm library</h5>
     <ol>
   <li class="section-title"><a href="../mailtm/mailtm-library.html#classes">Classes</a></li>
-  <li><a href="../mailtm/Attachment-class.html">Attachment</a></li>
-  <li><a href="../mailtm/Domain-class.html">Domain</a></li>
   <li><a href="../mailtm/MailTm-class.html">MailTm</a></li>
-  <li><a href="../mailtm/Message-class.html">Message</a></li>
-  <li><a href="../mailtm/MessageSource-class.html">MessageSource</a></li>
   <li><a href="../mailtm/TMAccount-class.html">TMAccount</a></li>
+  <li><a href="../mailtm/TMAttachment-class.html">TMAttachment</a></li>
+  <li><a href="../mailtm/TMDomain-class.html">TMDomain</a></li>
+  <li><a href="../mailtm/TMMessage-class.html">TMMessage</a></li>
+  <li><a href="../mailtm/TMMessageSource-class.html">TMMessageSource</a></li>
 
 
 
@@ -353,8 +377,9 @@ Be careful to not use an account after it is been deleted
       <a href="../mailtm/TMAccount-class.html#instance-properties">Properties</a>
     </li>
     <li><a href="../mailtm/TMAccount/address.html">address</a></li>
+    <li><a href="../mailtm/TMAccount/auth.html">auth</a></li>
     <li><a href="../mailtm/TMAccount/createdAt.html">createdAt</a></li>
-    <li class="inherited"><a href="https://api.dart.dev/dev/2.18.0-9.0.dev/dart-core/Object/hashCode.html">hashCode</a></li>
+    <li><a href="../mailtm/TMAccount/hashCode.html">hashCode</a></li>
     <li><a href="../mailtm/TMAccount/id.html">id</a></li>
     <li><a href="../mailtm/TMAccount/isDeleted.html">isDeleted</a></li>
     <li><a href="../mailtm/TMAccount/isDisabled.html">isDisabled</a></li>
@@ -367,14 +392,15 @@ Be careful to not use an account after it is been deleted
 
     <li class="section-title"><a href="../mailtm/TMAccount-class.html#instance-methods">Methods</a></li>
     <li><a href="../mailtm/TMAccount/delete.html">delete</a></li>
+    <li><a href="../mailtm/TMAccount/getAllMessages.html">getAllMessages</a></li>
     <li><a href="../mailtm/TMAccount/getMessages.html">getMessages</a></li>
     <li class="inherited"><a href="https://api.dart.dev/dev/2.18.0-9.0.dev/dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
     <li><a href="../mailtm/TMAccount/toJson.html">toJson</a></li>
     <li><a href="../mailtm/TMAccount/toString.html">toString</a></li>
     <li><a href="../mailtm/TMAccount/update.html">update</a></li>
 
-    <li class="section-title inherited"><a href="../mailtm/TMAccount-class.html#operators">Operators</a></li>
-    <li class="inherited"><a href="https://api.dart.dev/dev/2.18.0-9.0.dev/dart-core/Object/operator_equals.html">operator ==</a></li>
+    <li class="section-title"><a href="../mailtm/TMAccount-class.html#operators">Operators</a></li>
+    <li><a href="../mailtm/TMAccount/operator_equals.html">operator ==</a></li>
 
 
 
@@ -388,7 +414,7 @@ Be careful to not use an account after it is been deleted
 <footer>
   <span class="no-break">
     mailtm_client
-      1.1.3
+      2.0.0
   </span>
 
   

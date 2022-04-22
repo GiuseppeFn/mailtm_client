@@ -41,7 +41,7 @@ class MailTm {
   static Future<TMAccount> register({
     String? username,
     String? password,
-    Domain? domain,
+    TMDomain? domain,
     int randomStringLength = 10,
   }) async {
     if (username == null || username.isEmpty) {
@@ -50,7 +50,7 @@ class MailTm {
     if (password == null || password.isEmpty) {
       password = randomString(randomStringLength);
     }
-    domain ??= (await Domain.domains).first;
+    domain ??= (await TMDomain.domains).first;
     String address = username + '@${domain.domain}';
 
     var data = await Requests.post('/accounts', {
@@ -113,7 +113,7 @@ class MailTm {
     for (final String id in _auths.keys) {
       auths[id] = Auth(
         accountFromJson(
-          _auths[id]['account'],
+          Map<String, dynamic>.from(_auths[id]['account']),
           _auths[id]['account']['password'],
           _auths[id]['token'],
         ),

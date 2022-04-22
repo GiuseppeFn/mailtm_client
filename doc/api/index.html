@@ -55,11 +55,11 @@
 <p>This package is a simple but complete mail.tm api wrapper, you can use this to save and manage your accounts, as well read all your temporary emails.</p>
 <h2 id="example">Example</h2>
 <p>See in <a href="example/">the example folder</a></p>
-<h2 id="documentation">Documentation</h2>
-<h3 id="mailtm-class">MailTm class</h3>
+<h2 id="usage">Usage</h2>
+<h3 id="mailtm">MailTm</h3>
 <p>A static class which is mainly needed for storing, creating and loading accounts, you can load all accounts in a session by saving them with getAuths and loading them with loadAuths</p>
 <h4 id="create-an-account">Create an account</h4>
-<p><a href="#accounts">Go to Account section</a></p>
+<p><a href="#tmaccount">Go to Account section</a></p>
 <p>To create an account you just need to use the MailTm.register method.</p>
 <p>Params</p>
 <ul>
@@ -73,19 +73,19 @@
 <p>password: account's password</p>
 </li>
 <li>
-<p>domain: address' domain, (like @mail.tm, must be <a href="#domain">Domain</a> class), if not provided, a random one will be provided.</p>
+<p>domain: address' domain, (like @mail.tm, must be <a href="#tmdomain">Domain</a> class), if not provided, a random one will be provided.</p>
 </li>
 </ul>
 <p><code>await MailTm.register(password: 'ah yes password');</code></p>
 <p>Returns the <code>Future&lt;TMAccount&gt;</code> instance (Must be awaited as above!)</p>
 <h4 id="loading-an-account">Loading an account</h4>
-<p><a href="#accounts">Go to Account section</a></p>
+<p><a href="#tmaccount">Go to Account section</a></p>
 <p>You can load an account by using the MailTm.login method</p>
 <p>If you provide the id and it is present in the saved accounts it will return the saved account instance (Useful if you don't want to make another api request)</p>
 <p>If you don't, and you provide address and password it will retrieve the account from the api's</p>
 <p>If nothing is provided/the provided parameters are not valid and elseNew is true a new account will be returned (Default true)</p>
 <p>If nothing is provided and elseNew is false, throws MailError with code -1 (Invalid arguments)</p>
-<h3 id="account-class">Account class</h3>
+<h3 id="tmaccount">TMAccount</h3>
 <h5 id="class-members">Class members:</h5>
 <ul>
 <li><code>String id, address, and password</code>: Account's id, address and password.</li>
@@ -97,7 +97,7 @@
 <li><code>int used</code>: How many bytes are used from the quota</li>
 </ul>
 <h4 id="get-accounts-messages">Get Account's messages</h4>
-<p><a href="#messages">Go to Message section</a></p>
+<p><a href="#tmmessage">Go to Message section</a></p>
 <p>You can use</p>
 <p><code>await account.getMessages();</code></p>
 <p>Returns <code>Future&lt;List&lt;Message&gt;&gt;</code> (Must be awaited as above!)</p>
@@ -112,11 +112,11 @@
 <p>ACHTUNG: Be careful to not use the account after it has been deleted, or else errors will be thrown anytime you will try to use account's methods (Same thing for account's messages)</p>
 <p>Only access members!</p>
 <h4 id="listen-to-messages">Listen to messages</h4>
-<p><a href="#messages">Go to Message section</a></p>
+<p><a href="#tmmessage">Go to Message section</a></p>
 <p>You can do so by using</p>
 <p><code>account.messages.listen((){})</code></p>
 <p>account.messages returns a stream of <code>Messages</code></p>
-<h3 id="message-class">Message class</h3>
+<h3 id="tmmessage">TMMessage</h3>
 <h5 id="class-members-2">Class members</h5>
 <ul>
 <li>
@@ -174,7 +174,7 @@
 <p><code>bool</code> hasAttachments: Whether the message has attachments.</p>
 </li>
 <li>
-<p><code>List&lt;Attachment&gt;</code> attachments: List of the message.</p>
+<p><code>List&lt;TMAttachment&gt;</code> attachments: List of the message.</p>
 </li>
 <li>
 <p><code>int</code> size: The size of the message.</p>
@@ -201,7 +201,7 @@
 <p>You can do so by:</p>
 <p><code>await message.seen();</code></p>
 <p>Returns <code>Future&lt;bool&gt;</code> (Must be awaited as above!)</p>
-<h3 id="domain">Domain</h3>
+<h3 id="tmdomain">TMDomain</h3>
 <h4 id="class-members-3">Class members</h4>
 <ul>
 <li>
@@ -274,7 +274,7 @@ you can use this to save and manage your accounts, as well read all your tempora
 <footer>
   <span class="no-break">
     mailtm_client
-      1.1.3
+      2.0.0
   </span>
 
   

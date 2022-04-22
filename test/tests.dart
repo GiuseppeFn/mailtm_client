@@ -5,7 +5,7 @@ void main() async {
   tearDown(() async => await Future.delayed(Duration(seconds: 1)));
   late TMAccount account;
 
-  test('Domains', () => expect(Domain.domains, completes));
+  test('Domains', () => expect(TMDomain.domains, completes));
 
   group('MailTm tests -', () {
     test('Register', () async => account = await MailTm.register());

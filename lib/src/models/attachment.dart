@@ -3,10 +3,10 @@ import 'dart:typed_data';
 import '../mailtm.dart';
 import '../requests.dart';
 
-Attachment attachmentFromJson(Map<String, dynamic> json, String accountId) =>
-    Attachment._fromJson(json, accountId);
+TMAttachment attachmentFromJson(Map<String, dynamic> json, String accountId) =>
+    TMAttachment._fromJson(json, accountId);
 
-class Attachment {
+class TMAttachment {
   /// The attachment id.
   final String id;
 
@@ -33,7 +33,7 @@ class Attachment {
   /// The attachment's account id.
   final String _accountId;
 
-  const Attachment._({
+  const TMAttachment._({
     required this.id,
     required this.name,
     required this.type,
@@ -45,8 +45,8 @@ class Attachment {
     required accountId,
   }) : _accountId = accountId;
 
-  factory Attachment._fromJson(Map<String, dynamic> json, String accountId) =>
-      Attachment._(
+  factory TMAttachment._fromJson(Map<String, dynamic> json, String accountId) =>
+      TMAttachment._(
         id: json['id'],
         name: json['filename'],
         type: json['contentType'],

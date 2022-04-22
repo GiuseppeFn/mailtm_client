@@ -54,7 +54,7 @@
 <section id="getter">
 
 <section class="multi-line-signature">
-  <span class="returntype"><a href="https://api.dart.dev/dev/2.18.0-9.0.dev/dart-async/Stream-class.html">Stream</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../mailtm/Message-class.html">Message</a></span>&gt;</span></span>
+  <span class="returntype"><a href="https://api.dart.dev/dev/2.18.0-9.0.dev/dart-async/Stream-class.html">Stream</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../mailtm/TMMessage-class.html">TMMessage</a></span>&gt;</span></span>
   <span class="name ">messages</span>
   
 
@@ -62,14 +62,14 @@
 
 
 <section class="desc markdown">
-  <p>A stream of <code>Message</code></p>
+  <p>A stream of <code>TMMessage</code></p>
 </section>
 
 
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Stream&lt;Message&gt; get messages {
-  late StreamController&lt;Message&gt; controller;
+  <pre class="language-dart"><code class="language-dart">Stream&lt;TMMessage&gt; get messages {
+  late StreamController&lt;TMMessage&gt; controller;
   bool canYield = true;
 
   void tick() async {
@@ -81,11 +81,16 @@
         if (!canYield) return;
         var encodedData = jsonDecode(event.data);
         if (encodedData[&#39;@type&#39;] == &#39;Account&#39;) {
+          quota = encodedData[&#39;quota&#39;];
+          used = encodedData[&#39;used&#39;];
+          isDisabled = encodedData[&#39;isDisabled&#39;];
+          isDeleted = encodedData[&#39;isDeleted&#39;];
+          updatedAt = DateTime.parse(encodedData[&#39;updatedAt&#39;]);
           return;
         }
         Map&lt;String, dynamic&gt; data = await Requests.get&lt;Map&gt;(
           &#39;&#47;messages&#47;${encodedData[&#39;id&#39;]}&#39;,
-          auths[id]!.headers,
+          auth,
         ) as Map&lt;String, dynamic&gt;;
         data[&#39;intro&#39;] = encodedData[&#39;intro&#39;];
         controller.add(messageFromJson(data));
@@ -116,7 +121,7 @@
     return;
   }
 
-  controller = StreamController&lt;Message&gt;(
+  controller = StreamController&lt;TMMessage&gt;(
     onListen: listen,
     onPause: pause,
     onResume: listen,
@@ -156,8 +161,9 @@
       <a href="../../mailtm/TMAccount-class.html#instance-properties">Properties</a>
     </li>
     <li><a href="../../mailtm/TMAccount/address.html">address</a></li>
+    <li><a href="../../mailtm/TMAccount/auth.html">auth</a></li>
     <li><a href="../../mailtm/TMAccount/createdAt.html">createdAt</a></li>
-    <li class="inherited"><a href="https://api.dart.dev/dev/2.18.0-9.0.dev/dart-core/Object/hashCode.html">hashCode</a></li>
+    <li><a href="../../mailtm/TMAccount/hashCode.html">hashCode</a></li>
     <li><a href="../../mailtm/TMAccount/id.html">id</a></li>
     <li><a href="../../mailtm/TMAccount/isDeleted.html">isDeleted</a></li>
     <li><a href="../../mailtm/TMAccount/isDisabled.html">isDisabled</a></li>
@@ -170,14 +176,15 @@
 
     <li class="section-title"><a href="../../mailtm/TMAccount-class.html#instance-methods">Methods</a></li>
     <li><a href="../../mailtm/TMAccount/delete.html">delete</a></li>
+    <li><a href="../../mailtm/TMAccount/getAllMessages.html">getAllMessages</a></li>
     <li><a href="../../mailtm/TMAccount/getMessages.html">getMessages</a></li>
     <li class="inherited"><a href="https://api.dart.dev/dev/2.18.0-9.0.dev/dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
     <li><a href="../../mailtm/TMAccount/toJson.html">toJson</a></li>
     <li><a href="../../mailtm/TMAccount/toString.html">toString</a></li>
     <li><a href="../../mailtm/TMAccount/update.html">update</a></li>
 
-    <li class="section-title inherited"><a href="../../mailtm/TMAccount-class.html#operators">Operators</a></li>
-    <li class="inherited"><a href="https://api.dart.dev/dev/2.18.0-9.0.dev/dart-core/Object/operator_equals.html">operator ==</a></li>
+    <li class="section-title"><a href="../../mailtm/TMAccount-class.html#operators">Operators</a></li>
+    <li><a href="../../mailtm/TMAccount/operator_equals.html">operator ==</a></li>
 
 
 
@@ -194,7 +201,7 @@
 <footer>
   <span class="no-break">
     mailtm_client
-      1.1.3
+      2.0.0
   </span>
 
   

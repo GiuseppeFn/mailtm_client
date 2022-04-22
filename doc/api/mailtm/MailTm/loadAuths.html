@@ -69,7 +69,7 @@
   for (final String id in _auths.keys) {
     auths[id] = Auth(
       accountFromJson(
-        _auths[id][&#39;account&#39;],
+        Map&lt;String, dynamic&gt;.from(_auths[id][&#39;account&#39;]),
         _auths[id][&#39;account&#39;][&#39;password&#39;],
         _auths[id][&#39;token&#39;],
       ),
@@ -117,6 +117,7 @@
 
 
         <li class="section-title"><a href="../../mailtm/MailTm-class.html#static-properties">Static properties</a></li>
+          <li><a href="../../mailtm/MailTm/accounts.html">accounts</a></li>
           <li><a href="../../mailtm/MailTm/getAuths.html">getAuths</a></li>
 
         <li class="section-title"><a href="../../mailtm/MailTm-class.html#static-methods">Static methods</a></li>
@@ -136,7 +137,7 @@
 <footer>
   <span class="no-break">
     mailtm_client
-      1.1.3
+      2.0.0
   </span>
 
   

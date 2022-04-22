@@ -52,34 +52,23 @@
     <section class="multi-line-signature">
       
 
-<span class="returntype"><a href="https://api.dart.dev/dev/2.18.0-9.0.dev/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/dev/2.18.0-9.0.dev/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../mailtm/Message-class.html">Message</a></span>&gt;</span></span>&gt;</span></span>
-<span class="name ">getMessages</span>(<wbr>)
+<span class="returntype"><a href="https://api.dart.dev/dev/2.18.0-9.0.dev/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/dev/2.18.0-9.0.dev/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../mailtm/TMMessage-class.html">TMMessage</a></span>&gt;</span></span>&gt;</span></span>
+<span class="name ">getMessages</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="getMessages-param-page">[<span class="type-annotation"><a href="https://api.dart.dev/dev/2.18.0-9.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">page</span> = <span class="default-value">1</span>]</span></li>
+</ol>)
 
       
 
     </section>
     
 <section class="desc markdown">
-  <p>Returns the account's messages</p>
+  <p>Returns one page the account's messages (30 per page)</p>
 </section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Future&lt;List&lt;Message&gt;&gt; getMessages() async {
-  var msgs = await Requests.get&lt;List&gt;(&#39;&#47;messages&#39;, auths[id]!.headers);
-  final List&lt;Message&gt; result = [];
-  for (int i = 0; i &lt; msgs.length; ++i) {
-    Map&lt;String, dynamic&gt; data = await Requests.get&lt;Map&gt;(
-      &#39;&#47;messages&#47;${msgs[i][&#39;id&#39;]}&#39;,
-      auths[id]!.headers,
-    ) as Map&lt;String, dynamic&gt;;
-    data[&#39;intro&#39;] = msgs[i][&#39;intro&#39;];
-    result.add(messageFromJson(data));
-  }
-  return result;
-}</code></pre>
+  <pre class="language-dart"><code class="language-dart">Future&lt;List&lt;TMMessage&gt;&gt; getMessages([int page = 1]) =&gt; _getMessages(page);</code></pre>
 </section>
 
 
@@ -109,8 +98,9 @@
       <a href="../../mailtm/TMAccount-class.html#instance-properties">Properties</a>
     </li>
     <li><a href="../../mailtm/TMAccount/address.html">address</a></li>
+    <li><a href="../../mailtm/TMAccount/auth.html">auth</a></li>
     <li><a href="../../mailtm/TMAccount/createdAt.html">createdAt</a></li>
-    <li class="inherited"><a href="https://api.dart.dev/dev/2.18.0-9.0.dev/dart-core/Object/hashCode.html">hashCode</a></li>
+    <li><a href="../../mailtm/TMAccount/hashCode.html">hashCode</a></li>
     <li><a href="../../mailtm/TMAccount/id.html">id</a></li>
     <li><a href="../../mailtm/TMAccount/isDeleted.html">isDeleted</a></li>
     <li><a href="../../mailtm/TMAccount/isDisabled.html">isDisabled</a></li>
@@ -123,14 +113,15 @@
 
     <li class="section-title"><a href="../../mailtm/TMAccount-class.html#instance-methods">Methods</a></li>
     <li><a href="../../mailtm/TMAccount/delete.html">delete</a></li>
+    <li><a href="../../mailtm/TMAccount/getAllMessages.html">getAllMessages</a></li>
     <li><a href="../../mailtm/TMAccount/getMessages.html">getMessages</a></li>
     <li class="inherited"><a href="https://api.dart.dev/dev/2.18.0-9.0.dev/dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
     <li><a href="../../mailtm/TMAccount/toJson.html">toJson</a></li>
     <li><a href="../../mailtm/TMAccount/toString.html">toString</a></li>
     <li><a href="../../mailtm/TMAccount/update.html">update</a></li>
 
-    <li class="section-title inherited"><a href="../../mailtm/TMAccount-class.html#operators">Operators</a></li>
-    <li class="inherited"><a href="https://api.dart.dev/dev/2.18.0-9.0.dev/dart-core/Object/operator_equals.html">operator ==</a></li>
+    <li class="section-title"><a href="../../mailtm/TMAccount-class.html#operators">Operators</a></li>
+    <li><a href="../../mailtm/TMAccount/operator_equals.html">operator ==</a></li>
 
 
 
@@ -147,7 +138,7 @@
 <footer>
   <span class="no-break">
     mailtm_client
-      1.1.3
+      2.0.0
   </span>
 
   

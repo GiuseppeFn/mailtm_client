@@ -1,7 +1,7 @@
 import '../requests.dart';
 
 /// MailTm domains.
-class Domain {
+class TMDomain {
   /// Domain's id
   final String id;
 
@@ -20,7 +20,7 @@ class Domain {
   /// When the domain was updated
   final DateTime updatedAt;
 
-  const Domain({
+  const TMDomain({
     required this.id,
     required this.domain,
     required this.isActive,
@@ -29,7 +29,7 @@ class Domain {
     required this.updatedAt,
   });
 
-  factory Domain._fromJson(Map<String, dynamic> json) => Domain(
+  factory TMDomain._fromJson(Map<String, dynamic> json) => TMDomain(
         id: json['id'],
         domain: json['domain'],
         isActive: json['isActive'],
@@ -48,12 +48,26 @@ class Domain {
         'updatedAt': updatedAt.toIso8601String(),
       };
 
+  static Future<List<TMDomain>> _getDomains(int page, [Map? response]) async {
+    response ??= await Requests.get<Map>('/domains?page=page', {}, false);
+    final List<TMDomain> result = [];
+    for (int i = 0; i < response["hydra:member"].length; i++) {
+      result.add(TMDomain._fromJson(response["hydra:member"][i]));
+    }
+    return result;
+  }
+
   /// Returns all the domains
-  static Future<List<Domain>> get domains async {
-    final response = await Requests.get<List>('/domains');
-    List<Domain> result = [];
-    for (final item in response) {
-      result.add(Domain._fromJson(item));
+  static Future<List<TMDomain>> get domains async {
+    var response = await Requests.get<Map>('/domains?page=1', {}, false);
+    int iterations = ((response["hydra:totalItems"] / 30) as double).ceil();
+    if (iterations == 1) {
+      return _getDomains(-1, response);
+    }
+
+    final List<TMDomain> result = [];
+    for (int page = 2; page <= iterations; ++page) {
+      result.addAll(await _getDomains(page));
     }
     return result;
   }

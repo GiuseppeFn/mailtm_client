@@ -69,7 +69,7 @@ Be careful to not use an account after it is been deleted</p>
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">Future&lt;bool&gt; delete() async {
-  bool r = await Requests.delete(&#39;&#47;accounts&#47;$id&#39;, auths[id]!.headers);
+  bool r = await Requests.delete(&#39;&#47;accounts&#47;$id&#39;, auth);
   if (r) {
     auths.remove(id);
   }
@@ -104,8 +104,9 @@ Be careful to not use an account after it is been deleted</p>
       <a href="../../mailtm/TMAccount-class.html#instance-properties">Properties</a>
     </li>
     <li><a href="../../mailtm/TMAccount/address.html">address</a></li>
+    <li><a href="../../mailtm/TMAccount/auth.html">auth</a></li>
     <li><a href="../../mailtm/TMAccount/createdAt.html">createdAt</a></li>
-    <li class="inherited"><a href="https://api.dart.dev/dev/2.18.0-9.0.dev/dart-core/Object/hashCode.html">hashCode</a></li>
+    <li><a href="../../mailtm/TMAccount/hashCode.html">hashCode</a></li>
     <li><a href="../../mailtm/TMAccount/id.html">id</a></li>
     <li><a href="../../mailtm/TMAccount/isDeleted.html">isDeleted</a></li>
     <li><a href="../../mailtm/TMAccount/isDisabled.html">isDisabled</a></li>
@@ -118,14 +119,15 @@ Be careful to not use an account after it is been deleted</p>
 
     <li class="section-title"><a href="../../mailtm/TMAccount-class.html#instance-methods">Methods</a></li>
     <li><a href="../../mailtm/TMAccount/delete.html">delete</a></li>
+    <li><a href="../../mailtm/TMAccount/getAllMessages.html">getAllMessages</a></li>
     <li><a href="../../mailtm/TMAccount/getMessages.html">getMessages</a></li>
     <li class="inherited"><a href="https://api.dart.dev/dev/2.18.0-9.0.dev/dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
     <li><a href="../../mailtm/TMAccount/toJson.html">toJson</a></li>
     <li><a href="../../mailtm/TMAccount/toString.html">toString</a></li>
     <li><a href="../../mailtm/TMAccount/update.html">update</a></li>
 
-    <li class="section-title inherited"><a href="../../mailtm/TMAccount-class.html#operators">Operators</a></li>
-    <li class="inherited"><a href="https://api.dart.dev/dev/2.18.0-9.0.dev/dart-core/Object/operator_equals.html">operator ==</a></li>
+    <li class="section-title"><a href="../../mailtm/TMAccount-class.html#operators">Operators</a></li>
+    <li><a href="../../mailtm/TMAccount/operator_equals.html">operator ==</a></li>
 
 
 
@@ -142,7 +144,7 @@ Be careful to not use an account after it is been deleted</p>
 <footer>
   <span class="no-break">
     mailtm_client
-      1.1.3
+      2.0.0
   </span>
 
   

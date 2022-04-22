@@ -30,8 +30,12 @@ class MailException implements Exception {
 class Requests {
   /// get requests
   /// Accepts only headers (optional)
-  static Future<T> get<T>(String endpoint, [Map<String, String>? headers]) =>
-      request<T>(endpoint, 'GET', headers: headers);
+  static Future<T> get<T>(
+    String endpoint, [
+    Map<String, String>? headers,
+    bool json = true,
+  ]) =>
+      request<T>(endpoint, 'GET', headers: headers, json: json);
 
   /// post requests
   /// Accepts only the data (body) of the request
@@ -71,9 +75,10 @@ class Requests {
     Map<String, String>? headers,
     Map<String, String>? data,
     ResponseType? responseType,
+    bool json = true,
   }) async {
     headers ??= {};
-    headers['Accept'] = 'application/json';
+    headers['Accept'] = json ? 'application/json' : 'application/ld+json';
     Response response;
     int statusCode;
     do {

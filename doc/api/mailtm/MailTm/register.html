@@ -55,7 +55,7 @@
 <span class="returntype"><a href="https://api.dart.dev/dev/2.18.0-9.0.dev/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../mailtm/TMAccount-class.html">TMAccount</a></span>&gt;</span></span>
 <span class="name ">register</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="register-param-username">{<span class="type-annotation"><a href="https://api.dart.dev/dev/2.18.0-9.0.dev/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">username</span>, </span></li>
 <li><span class="parameter" id="register-param-password"><span class="type-annotation"><a href="https://api.dart.dev/dev/2.18.0-9.0.dev/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">password</span>, </span></li>
-<li><span class="parameter" id="register-param-domain"><span class="type-annotation"><a href="../../mailtm/Domain-class.html">Domain</a>?</span> <span class="parameter-name">domain</span>, </span></li>
+<li><span class="parameter" id="register-param-domain"><span class="type-annotation"><a href="../../mailtm/TMDomain-class.html">TMDomain</a>?</span> <span class="parameter-name">domain</span>, </span></li>
 <li><span class="parameter" id="register-param-randomStringLength"><span class="type-annotation"><a href="https://api.dart.dev/dev/2.18.0-9.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">randomStringLength</span> = <span class="default-value">10</span>}</span></li>
 </ol>)
 
@@ -75,7 +75,7 @@ If they're not set, they'll be randomized with a <code>randomStringLength</code>
   <pre class="language-dart"><code class="language-dart">static Future&lt;TMAccount&gt; register({
   String? username,
   String? password,
-  Domain? domain,
+  TMDomain? domain,
   int randomStringLength = 10,
 }) async {
   if (username == null || username.isEmpty) {
@@ -84,7 +84,7 @@ If they're not set, they'll be randomized with a <code>randomStringLength</code>
   if (password == null || password.isEmpty) {
     password = randomString(randomStringLength);
   }
-  domain ??= (await Domain.domains).first;
+  domain ??= (await TMDomain.domains).first;
   String address = username + &#39;@${domain.domain}&#39;;
 
   var data = await Requests.post(&#39;&#47;accounts&#39;, {
@@ -137,6 +137,7 @@ If they're not set, they'll be randomized with a <code>randomStringLength</code>
 
 
         <li class="section-title"><a href="../../mailtm/MailTm-class.html#static-properties">Static properties</a></li>
+          <li><a href="../../mailtm/MailTm/accounts.html">accounts</a></li>
           <li><a href="../../mailtm/MailTm/getAuths.html">getAuths</a></li>
 
         <li class="section-title"><a href="../../mailtm/MailTm-class.html#static-methods">Static methods</a></li>
@@ -156,7 +157,7 @@ If they're not set, they'll be randomized with a <code>randomStringLength</code>
 <footer>
   <span class="no-break">
     mailtm_client
-      1.1.3
+      2.0.0
   </span>
 
   
