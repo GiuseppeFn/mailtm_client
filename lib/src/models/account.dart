@@ -1,19 +1,6 @@
-import 'dart:async';
-import 'dart:convert';
-import 'package:mercure_client/mercure_client.dart';
+part of mailtm;
 
-import '../mailtm.dart';
-import '../requests.dart';
-import 'message.dart';
-
-accountFromApi(String address, String password, [String? token]) =>
-    TMAccount._fromApi(address, password);
-
-TMAccount accountFromJson(
-        Map<String, dynamic> json, String password, String token) =>
-    TMAccount._fromJson(json, password, token);
-
-class TMAccount {
+abstract class Account {
   /// Account's id.
   final String id;
 
@@ -43,7 +30,11 @@ class TMAccount {
 
   final Mercure _mercure;
 
-  TMAccount._({
+  final String _token;
+
+  final Requests _requests;
+
+  Account._({
     required this.id,
     required this.address,
     required this.password,
@@ -53,106 +44,115 @@ class TMAccount {
     required this.isDeleted,
     required this.createdAt,
     required this.updatedAt,
+    required Requests requests,
     required Mercure mercure,
-  }) : this._mercure = mercure;
+    required String token,
+  })  : this._mercure = mercure,
+        this._token = token,
+        this._requests = requests;
 
-  factory TMAccount._fromJson(Map<String, dynamic> json, String password,
-          [String? token]) =>
-      TMAccount._(
-        id: json['id'],
-        address: json['address'],
-        password: password,
-        quota: json['quota'],
-        used: json['used'],
-        isDisabled: json['isDisabled'],
-        isDeleted: json['isDeleted'],
-        createdAt: DateTime.parse(json['createdAt']),
-        updatedAt: DateTime.parse(json['updatedAt']),
-        mercure: Mercure(
-          url: 'https://mercure.mail.tm/.well-known/mercure',
-          topics: ["/accounts/${json['id']}"],
-          token: token,
-        ),
-      );
+  factory Account._fromJson(
+    Map<String, dynamic> json,
+    String password,
+    String token,
+    MailService service,
+  ) {
+    if (service.isTm) {
+      return TmAccount._fromJson(json, password, token);
+    }
+    return GwAccount._fromJson(json, password, token);
+  }
 
   /// Retrieves an account from MailTm API
-  static Future<TMAccount> _fromApi(String address, String password) async {
-    String token = await getToken(address, password);
-
-    var data = await Requests.get<Map>(
+  static Future<Account> _fromApi(
+    String address,
+    String password,
+    String token,
+    MailService service,
+  ) async {
+    final Requests requests = service.isTm ? tmrequests : gwrequests;
+    var data = await requests.get<Map>(
       '/me',
       {'Authorization': 'Bearer $token'},
     ) as Map<String, dynamic>;
-
-    TMAccount account = TMAccount._fromJson(data, password);
-
-    auths[data['id']] = Auth(account, token);
-
-    return account;
-  }
-
-  /// Deletes the account
-  /// Be careful to not use an account after it is been deleted
-  Future<bool> delete() async {
-    bool r = await Requests.delete('/accounts/$id', auth);
-    if (r) {
-      auths.remove(id);
-    }
-    return r;
+    return Account._fromJson(data, password, token, service);
   }
 
   /// Returns all the account's messages
-  Future<List<TMMessage>> getAllMessages() async {
-    var response = await Requests.get<Map>('/messages?page=1', auth, false);
+  Future<List<Message>> getAllMessages() async {
+    var response = await _requests.get<Map>('/messages?page=1', _auth, false);
     int iterations = ((response["hydra:totalItems"] / 30) as double).ceil();
     if (iterations == 1) {
       return _getMessages(-1, response);
     }
 
-    final List<TMMessage> result = [];
+    final List<Message> result = [];
     for (int page = 2; page <= iterations; ++page) {
       result.addAll(await getMessages(page));
     }
     return result;
   }
 
+  /// Deletes the account
+  /// Be careful to not use an account after it is been deleted
+  Future<bool> delete() async {
+    bool r = await _requests.delete('/accounts/$id', _auth);
+    if (r) {
+      if (this.runtimeType == TmAccount) {
+        MailClient._tmaccounts.remove(this);
+      } else {
+        MailClient._gwaccounts.remove(this);
+      }
+    }
+    return r;
+  }
+
   /// Private function, returns one page of the account messages
   /// Private as it accepts a response, to avoid multiple requests from the getAllMessages function
-  Future<List<TMMessage>> _getMessages(int page, [Map? response]) async {
-    response ??= await Requests.get<Map>('/messages?page=$page ', auth, false);
-    final List<TMMessage> result = [];
+  Future<List<Message>> _getMessages(int page, [Map? response]) async {
+    response ??=
+        await _requests.get<Map>('/messages?page=$page ', _auth, false);
+    final List<Message> result = [];
     var member = response["hydra:member"];
     for (int i = 0; i < member.length; i++) {
-      Map<String, dynamic> data = await Requests.get<Map>(
+      Map<String, dynamic> data = await _requests.get<Map>(
         '/messages/${member[i]['id']}',
-        auth,
+        _auth,
       ) as Map<String, dynamic>;
       data['intro'] = member[i]['intro'];
-      result.add(messageFromJson(data));
+      result.add(Message._fromJson(
+        data,
+        _token,
+        runtimeType == TmAccount ? MailService.Tm : MailService.Gw,
+      ));
     }
     return result;
   }
 
   /// Returns one page the account's messages (30 per page)
-  Future<List<TMMessage>> getMessages([int page = 1]) => _getMessages(page);
+  Future<List<Message>> getMessages([int page = 1]) => _getMessages(page);
 
   /// Updates the account instance and returns it
-  Future<TMAccount> update() async {
-    var data = await Requests.get<Map<String, dynamic>>('/me', auth);
+  Future<Account> update() async {
+    var data = await _requests.get<Map<String, dynamic>>('/me', _auth);
 
-    TMAccount account = TMAccount._fromJson(data, password);
+    Account account = Account._fromJson(
+      data,
+      password,
+      _token,
+      runtimeType == TmAccount ? MailService.Tm : MailService.Gw,
+    );
     quota = account.quota;
     used = account.used;
     isDisabled = account.isDisabled;
     isDeleted = account.isDeleted;
     updatedAt = account.updatedAt;
-    auths[id] = Auth(account, auths[id]!.token);
     return account;
   }
 
-  /// A stream of [TMMessage]
-  Stream<TMMessage> get messages {
-    late StreamController<TMMessage> controller;
+  /// A stream of [Message]
+  Stream<Message> get messages {
+    late StreamController<Message> controller;
     bool canYield = true;
 
     void tick() async {
@@ -171,12 +171,16 @@ class TMAccount {
             updatedAt = DateTime.parse(encodedData['updatedAt']);
             return;
           }
-          Map<String, dynamic> data = await Requests.get<Map>(
+          Map<String, dynamic> data = await _requests.get<Map>(
             '/messages/${encodedData['id']}',
-            auth,
+            _auth,
           ) as Map<String, dynamic>;
           data['intro'] = encodedData['intro'];
-          controller.add(messageFromJson(data));
+          controller.add(Message._fromJson(
+            data,
+            _token,
+            runtimeType == TmAccount ? MailService.Tm : MailService.Gw,
+          ));
         } catch (e) {
           controller.addError(e);
         }
@@ -204,7 +208,7 @@ class TMAccount {
       return;
     }
 
-    controller = StreamController<TMMessage>(
+    controller = StreamController<Message>(
       onListen: listen,
       onPause: pause,
       onResume: listen,
@@ -225,15 +229,62 @@ class TMAccount {
         'createdAt': createdAt.toIso8601String(),
         'updatedAt': updatedAt.toIso8601String(),
       };
-  Map<String, String> get auth => auths[id]!.headers;
+
+  Map<String, String> get _auth => {'Authorization': 'Bearer $_token'};
 
   @override
   operator ==(Object other) =>
-      identical(this, other) || other is TMAccount && id == other.id;
+      identical(this, other) ||
+      (other is Account && id == other.id) ||
+      (other is String && id == other);
 
   @override
   int get hashCode => id.hashCode;
 
   @override
   String toString() => address;
+}
+
+class TmAccount extends Account {
+  TmAccount._fromJson(Map<String, dynamic> json, String password, String token)
+      : super._(
+          id: json['id'],
+          address: json['address'],
+          password: password,
+          quota: json['quota'],
+          used: json['used'],
+          isDisabled: json['isDisabled'],
+          isDeleted: json['isDeleted'],
+          createdAt: DateTime.parse(json['createdAt']),
+          updatedAt: DateTime.parse(json['updatedAt']),
+          token: token,
+          mercure: Mercure(
+            url: 'https://mercure.mail.tm/.well-known/mercure',
+            topics: ["/accounts/${json['id']}"],
+            token: token,
+          ),
+          requests: tmrequests,
+        );
+}
+
+class GwAccount extends Account {
+  GwAccount._fromJson(Map<String, dynamic> json, String password, String token)
+      : super._(
+          id: json['id'],
+          address: json['address'],
+          password: password,
+          quota: json['quota'],
+          used: json['used'],
+          isDisabled: json['isDisabled'],
+          isDeleted: json['isDeleted'],
+          createdAt: DateTime.parse(json['createdAt']),
+          updatedAt: DateTime.parse(json['updatedAt']),
+          token: token,
+          mercure: Mercure(
+            url: 'https://api.mail.gw/.well-known/mercure',
+            topics: ["/accounts/${json['id']}"],
+            token: token,
+          ),
+          requests: gwrequests,
+        );
 }

@@ -1,13 +1,7 @@
-import 'attachment.dart';
-import 'message_source.dart';
-import '../requests.dart';
-import '../mailtm.dart';
+part of mailtm;
 
-TMMessage messageFromJson(Map<String, dynamic> json) =>
-    TMMessage._fromMap(json);
-
-class TMMessage {
-  TMMessage._({
+abstract class Message {
+  Message._({
     required this.id,
     required this.accountId,
     required this.msgid,
@@ -31,7 +25,9 @@ class TMMessage {
     required this.url,
     required this.createdAt,
     required this.updatedAt,
-  });
+    required String token,
+    required MailService service,
+  }) : _token = token;
 
   /// The unique identifier of the message (MailTm DB).
   final String id;
@@ -89,7 +85,7 @@ class TMMessage {
   final bool hasAttachments;
 
   /// List of the message.
-  final List<TMAttachment> attachments;
+  final List<Attachment> attachments;
 
   /// The size of the message.
   final int size;
@@ -103,36 +99,18 @@ class TMMessage {
   /// When the message was seen
   final DateTime updatedAt;
 
-  factory TMMessage._fromMap(Map<String, dynamic> json) => TMMessage._(
-        id: json["id"],
-        accountId: json["accountId"].split('/accounts/')[1],
-        msgid: json["msgid"],
-        intro: json["intro"],
-        from: json["from"],
-        to: List<Map<String, dynamic>>.from(json["to"]),
-        cc: List<String>.from(json["cc"]),
-        bcc: List<String>.from(json["bcc"]),
-        subject: json["subject"],
-        seen: json["seen"],
-        flagged: json["flagged"],
-        isDeleted: json["isDeleted"],
-        verifications: List<String>.from(json["verifications"]),
-        retention: json["retention"],
-        retentionDate: DateTime.parse(json["retentionDate"]),
-        text: json["text"],
-        html: List<String>.from(json["html"]),
-        hasAttachments: json["hasAttachments"],
-        attachments: json["attachments"]
-            .map<TMAttachment>((e) => attachmentFromJson(
-                  e,
-                  json["accountId"].split('/accounts/')[1],
-                ))
-            .toList(),
-        size: json["size"],
-        url: json["downloadUrl"],
-        createdAt: DateTime.parse(json["createdAt"]),
-        updatedAt: DateTime.parse(json["updatedAt"]),
-      );
+  final String _token;
+
+  factory Message._fromJson(
+    Map<String, dynamic> json,
+    String token,
+    MailService service,
+  ) {
+    if (service.isTm) {
+      return TmMessage._fromJson(json, token);
+    }
+    return GwMessage._fromJson(json, token);
+  }
 
   /// Returns the message as a map.
   Map<String, dynamic> toJson() => {
@@ -161,21 +139,20 @@ class TMMessage {
         "updatedAt": updatedAt.toIso8601String(),
       };
 
-  /// Downloads the message as [TMMessageSource]
-  Future<TMMessageSource> download() async {
-    var r = await Requests.get<Map>('/sources/$id', auths[accountId]!.headers)
+  /// Downloads the message as [MessageSource]
+  Future<MessageSource> download() async {
+    var r = await requests.get<Map>('/sources/$id', headers)
         as Map<String, dynamic>;
-    return messageSourceFromJson(r);
+    return MessageSource._fromJson(r);
   }
 
   /// Deletes the message.
-  Future<bool> delete() =>
-      Requests.delete('/messages/$id', auths[accountId]!.headers);
+  Future<bool> delete() => requests.delete('/messages/$id', headers);
 
   /// Marks the message as seen.
   Future<bool> see() async {
     try {
-      var r = await Requests.patch('/messages/$id', auths[accountId]!.headers);
+      var r = await requests.patch('/messages/$id', headers);
       return r;
     } catch (e) {
       if (e is MailException) {
@@ -187,7 +164,90 @@ class TMMessage {
     }
   }
 
+  Requests get requests;
+
+  Map<String, String> get headers => {'Authorization': 'Bearer $_token'};
+
   /// Stringifies the message
   @override
   String toString() => id;
+}
+
+class TmMessage extends Message {
+  //fromJson constructor
+  TmMessage._fromJson(Map<String, dynamic> json, String token)
+      : super._(
+          id: json["id"],
+          accountId: json["accountId"].split('/accounts/')[1],
+          msgid: json["msgid"],
+          intro: json["intro"],
+          from: json["from"],
+          to: List<Map<String, dynamic>>.from(json["to"]),
+          cc: List<String>.from(json["cc"]),
+          bcc: List<String>.from(json["bcc"]),
+          subject: json["subject"],
+          seen: json["seen"],
+          flagged: json["flagged"],
+          isDeleted: json["isDeleted"],
+          verifications: List<String>.from(json["verifications"]),
+          retention: json["retention"],
+          retentionDate: DateTime.parse(json["retentionDate"]),
+          text: json["text"],
+          html: List<String>.from(json["html"]),
+          hasAttachments: json["hasAttachments"],
+          attachments: json["attachments"]
+              .map<Attachment>((e) => Attachment._fromJson(
+                    e,
+                    token,
+                    MailService.Tm,
+                  ))
+              .toList(),
+          size: json["size"],
+          url: json["downloadUrl"],
+          createdAt: DateTime.parse(json["createdAt"]),
+          updatedAt: DateTime.parse(json["updatedAt"]),
+          token: token,
+          service: MailService.Tm,
+        );
+
+  Requests get requests => tmrequests;
+}
+
+class GwMessage extends Message {
+  //fromJson constructor
+  GwMessage._fromJson(Map<String, dynamic> json, String token)
+      : super._(
+          id: json["id"],
+          accountId: json["accountId"].split('/accounts/')[1],
+          msgid: json["msgid"],
+          intro: json["intro"],
+          from: json["from"],
+          to: List<Map<String, dynamic>>.from(json["to"]),
+          cc: List<String>.from(json["cc"]),
+          bcc: List<String>.from(json["bcc"]),
+          subject: json["subject"],
+          seen: json["seen"],
+          flagged: json["flagged"],
+          isDeleted: json["isDeleted"],
+          verifications: List<String>.from(json["verifications"]),
+          retention: json["retention"],
+          retentionDate: DateTime.parse(json["retentionDate"]),
+          text: json["text"],
+          html: List<String>.from(json["html"]),
+          hasAttachments: json["hasAttachments"],
+          attachments: json["attachments"]
+              .map<Attachment>((e) => Attachment._fromJson(
+                    e,
+                    token,
+                    MailService.Gw,
+                  ))
+              .toList(),
+          size: json["size"],
+          url: json["downloadUrl"],
+          createdAt: DateTime.parse(json["createdAt"]),
+          updatedAt: DateTime.parse(json["updatedAt"]),
+          token: token,
+          service: MailService.Tm,
+        );
+  Requests get requests => gwrequests;
 }

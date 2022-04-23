@@ -1,7 +1,6 @@
-TMMessageSource messageSourceFromJson(Map<String, dynamic> json) =>
-    TMMessageSource._fromJson(json);
+part of mailtm;
 
-class TMMessageSource {
+class MessageSource {
   /// The id of the message.
   final String id;
 
@@ -11,16 +10,16 @@ class TMMessageSource {
   /// Message data
   final String data;
 
-  TMMessageSource._({
+  MessageSource._({
     required this.id,
     required this.url,
     required this.data,
   });
 
-  factory TMMessageSource._fromJson(
+  factory MessageSource._fromJson(
     Map<String, dynamic> json,
   ) =>
-      TMMessageSource._(
+      MessageSource._(
         id: json['id'],
         url: json['downloadUrl'],
         data: json['data'],

@@ -1,45 +1,32 @@
-import 'dart:convert';
-import 'dart:typed_data';
+part of mailtm;
 
-import 'package:dio/dio.dart';
-
-/// Requests base url
-const String _baseUrl = 'https://api.mail.tm';
-
-/// Dio client
-late final Dio _dio = Dio(BaseOptions(
-  baseUrl: _baseUrl,
-  contentType: 'application/json',
-  validateStatus: (int? status) => (status ?? 400) < 500,
-));
-
-/// Client's exception class.
-/// If you want to see what corresponds to the error codes see [Requests.request]
-class MailException implements Exception {
-  final String? message;
-  final int? code;
-
-  MailException([this.message = 'Unknown error.', this.code = 0]);
-
-  @override
-  String toString() =>
-      (code ?? 0).toString() + ': ' + (message ?? 'Unknown error.');
-}
+late final Requests tmrequests = Requests._(MailService.Tm);
+late final Requests gwrequests = Requests._(MailService.Gw);
 
 /// Class for handling requests.
 class Requests {
+  final Dio _dio;
+
+  Requests._(MailService service)
+      : _dio = Dio(BaseOptions(
+          baseUrl:
+              service.isTm ? 'https://api.mail.tm/' : 'https://api.mail.gw/',
+          contentType: 'application/json',
+          validateStatus: (int? status) => (status ?? 400) < 500,
+        ));
+
   /// get requests
   /// Accepts only headers (optional)
-  static Future<T> get<T>(
+  Future<T> get<T>(
     String endpoint, [
-    Map<String, String>? headers,
+    Map<String, String> headers = const {},
     bool json = true,
   ]) =>
       request<T>(endpoint, 'GET', headers: headers, json: json);
 
   /// post requests
   /// Accepts only the data (body) of the request
-  static Future<Map<String, dynamic>> post(
+  Future<Map<String, dynamic>> post(
     String endpoint,
     Map<String, String> data,
   ) =>
@@ -47,16 +34,16 @@ class Requests {
 
   /// patch requests
   /// Accepts only the headers
-  static Future<bool> patch(String endpoint, Map<String, String> headers) =>
-      request(endpoint, 'PATCH', headers: headers);
+  Future<bool> patch(String endpoint, Map<String, String> headers) =>
+      request(endpoint, 'PATCH', headers: headers, data: {'seen': true});
 
   /// delete requests
   /// Accepts only the headers.
-  static Future<bool> delete(String endpoint, Map<String, String> headers) =>
+  Future<bool> delete(String endpoint, Map<String, String> headers) =>
       request<bool>(endpoint, 'DELETE', headers: headers);
 
   /// Downloads a file as Uint8List
-  static Future<Uint8List> download(
+  Future<Uint8List> download(
     String endpoint,
     Map<String, String> headers,
   ) =>
@@ -69,11 +56,11 @@ class Requests {
 
   /// request method for handling requests.
   /// Accepts the endpoint, method and optional headers and data.
-  static Future<T> request<T>(
+  Future<T> request<T>(
     String endpoint,
     String method, {
     Map<String, String>? headers,
-    Map<String, String>? data,
+    Map<String, dynamic>? data,
     ResponseType? responseType,
     bool json = true,
   }) async {

@@ -1,12 +1,6 @@
-import 'dart:typed_data';
+part of mailtm;
 
-import '../mailtm.dart';
-import '../requests.dart';
-
-TMAttachment attachmentFromJson(Map<String, dynamic> json, String accountId) =>
-    TMAttachment._fromJson(json, accountId);
-
-class TMAttachment {
+abstract class Attachment {
   /// The attachment id.
   final String id;
 
@@ -31,9 +25,11 @@ class TMAttachment {
   final String url;
 
   /// The attachment's account id.
-  final String _accountId;
+  final String _token;
 
-  const TMAttachment._({
+  final MailService _service;
+
+  const Attachment._({
     required this.id,
     required this.name,
     required this.type,
@@ -42,29 +38,66 @@ class TMAttachment {
     required this.related,
     required this.size,
     required this.url,
-    required accountId,
-  }) : _accountId = accountId;
+    required String token,
+    required MailService service,
+  })  : _token = token,
+        _service = service;
 
-  factory TMAttachment._fromJson(Map<String, dynamic> json, String accountId) =>
-      TMAttachment._(
-        id: json['id'],
-        name: json['filename'],
-        type: json['contentType'],
-        disposition: json['disposition'],
-        encoding: json['transferEncoding'],
-        related: json['related'],
-        size: json['size'],
-        url: json['downloadUrl'],
-        accountId: accountId,
-      );
+  factory Attachment._fromJson(
+    Map<String, dynamic> json,
+    String token,
+    MailService service,
+  ) {
+    if (service.isTm) {
+      return TmAttachment._fromJson(json, token);
+    }
+    return GwAttachment._fromJson(json, token);
+  }
 
   /// Downloads the attachment
-  Future<Uint8List> download() =>
-      Requests.download(url, auths[_accountId]!.headers);
-
-  /// Download the attachment from the server.
-  static Future<String> fromUrl(String url) => Requests.get<String>(url);
+  Future<Uint8List> download() {
+    if (_service.isTm) {
+      return tmrequests.download(url, {'Authorization': 'Bearer $_token'});
+    }
+    return gwrequests.download(url, {'Authorization': 'Bearer $_token'});
+  }
 
   @override
   String toString() => name;
+}
+
+class TmAttachment extends Attachment {
+  TmAttachment._fromJson(
+    Map<String, dynamic> json,
+    String token,
+  ) : super._(
+          id: json['id'],
+          name: json['filename'],
+          type: json['contentType'],
+          disposition: json['disposition'],
+          encoding: json['transferEncoding'],
+          related: json['related'],
+          size: json['size'],
+          url: json['downloadUrl'],
+          token: token,
+          service: MailService.Tm,
+        );
+}
+
+class GwAttachment extends Attachment {
+  GwAttachment._fromJson(
+    Map<String, dynamic> json,
+    String token,
+  ) : super._(
+          id: json['id'],
+          name: json['filename'],
+          type: json['contentType'],
+          disposition: json['disposition'],
+          encoding: json['transferEncoding'],
+          related: json['related'],
+          size: json['size'],
+          url: json['downloadUrl'],
+          token: token,
+          service: MailService.Gw,
+        );
 }

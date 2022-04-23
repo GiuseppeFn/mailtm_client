@@ -2,9 +2,19 @@
 ///you can use this to save and manage your accounts, as well read all your temporary emails.
 library mailtm;
 
-export 'src/mailtm.dart' hide randomString, getToken, auths, Auth;
-export 'src/models/account.dart' hide accountFromJson, accountFromApi;
-export 'src/models/message.dart' hide messageFromJson;
-export 'src/models/attachment.dart' hide attachmentFromJson;
-export 'src/models/message_source.dart' hide messageSourceFromJson;
-export 'src/models/domain.dart';
+import 'dart:async';
+import 'dart:convert';
+import 'dart:math';
+import 'dart:typed_data';
+
+import 'package:dio/dio.dart';
+import 'package:mercure_client/mercure_client.dart';
+
+part 'src/clients.dart';
+part 'src/models/account.dart';
+part 'src/models/message.dart';
+part 'src/models/attachment.dart';
+part 'src/models/message_source.dart';
+part 'src/models/domain.dart';
+part 'src/requests.dart';
+part 'src/utilities.dart';
